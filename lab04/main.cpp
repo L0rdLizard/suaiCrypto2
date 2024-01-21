@@ -7,8 +7,8 @@ int main(int argc, char const *argv[])
 
     //scanf_s("%d", a);
 
-    printf("vvedi chislo pipiska\n");
-    scanf_s("%d", &a);
+    printf("vvedi chislo\n");
+    cin >> a;
     
     cout << "hellou chat";
 
