@@ -3,8 +3,6 @@
 #include <cstdint>
 #include <cstring>
 
-#define LEFTROTATE(x, n) (((x) << (n)) | ((x) >> (32 - (n))))
-
 
 // Прототипы функций
 uint32_t F(uint32_t x, uint32_t y, uint32_t z);
@@ -12,17 +10,6 @@ uint32_t G(uint32_t x, uint32_t y, uint32_t z);
 uint32_t H(uint32_t x, uint32_t y, uint32_t z);
 uint32_t I(uint32_t x, uint32_t y, uint32_t z);
 uint32_t J(uint32_t x, uint32_t y, uint32_t z);
-// void FF(uint32_t& a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac);
-// void GG(uint32_t& a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac);
-// void HH(uint32_t& a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac);
-// void II(uint32_t& a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac);
-// void JJ(uint32_t& a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac);
-// void round1(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t& e, uint32_t x, uint32_t s, uint32_t ac);
-// void round2(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t& e, uint32_t x, uint32_t s, uint32_t ac);
-// void round3(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t& e, uint32_t x, uint32_t s, uint32_t ac);
-// void round4(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t& e, uint32_t x, uint32_t s, uint32_t ac);
-// void round5(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t& e, uint32_t x, uint32_t s, uint32_t ac);
-// std::string ripemd160(const std::string& input);
 
 const uint32_t K[5] = {
     0x00000000, 0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xa953fd4e
@@ -79,131 +66,6 @@ uint32_t J(uint32_t x, uint32_t y, uint32_t z) {
     return x ^ (y | ~z);
 }
 
-// void FF(uint32_t& a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac) {
-//     a += F(b, c, d) + x + ac;
-//     a = ((a << s) | (a >> (32 - s)));
-//     a += b;
-// }
-
-// void GG(uint32_t& a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac) {
-//     a += G(b, c, d) + x + ac;
-//     a = ((a << s) | (a >> (32 - s)));
-//     a += b;
-// }
-
-// void HH(uint32_t& a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac) {
-//     a += H(b, c, d) + x + ac;
-//     a = ((a << s) | (a >> (32 - s)));
-//     a += b;
-// }
-
-// void II(uint32_t& a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac) {
-//     a += I(b, c, d) + x + ac;
-//     a = ((a << s) | (a >> (32 - s)));
-//     a += b;
-// }
-
-// void JJ(uint32_t& a, uint32_t b, uint32_t c, uint32_t d, uint32_t x, uint32_t s, uint32_t ac) {
-//     a += (c ^ (b | ~d)) + x + ac;
-//     a = ((a << s) | (a >> (32 - s)));
-//     a += b;
-// }
-
-// void round1(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t& e, uint32_t x, uint32_t s, uint32_t ac) {
-//     FF(a, b, c, d, x, s, ac);
-//     FF(e, a, b, c, x, s, ac);
-// }
-
-// void round2(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t& e, uint32_t x, uint32_t s, uint32_t ac) {
-//     GG(a, b, c, d, x, s, ac);
-//     GG(e, a, b, c, x, s, ac);
-// }
-
-// void round3(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t& e, uint32_t x, uint32_t s, uint32_t ac) {
-//     HH(a, b, c, d, x, s, ac);
-//     HH(e, a, b, c, x, s, ac);
-// }
-
-// void round4(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t& e, uint32_t x, uint32_t s, uint32_t ac) {
-//     II(a, b, c, d, x, s, ac);
-//     II(e, a, b, c, x, s, ac);
-// }
-
-// void round5(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t& e, uint32_t x, uint32_t s, uint32_t ac) {
-//     JJ(a, b, c, d, x, s, ac);
-//     JJ(e, a, b, c, x, s, ac);
-// }
-
-// void compress(uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d, uint32_t& e, const uint32_t* W, const uint32_t* R, const uint32_t* S, const uint32_t* K, size_t rounds) {
-//     for (size_t i = 0; i < rounds; ++i) {
-//         uint32_t temp = a + F(b, c, d) + W[R[i]] + K[i];
-//         temp = ((temp << S[i]) | (temp >> (32 - S[i]))) + e;
-//         a = e;
-//         e = d;
-//         d = (c << 10) | (c >> 22);
-//         c = b;
-//         b = temp;
-//     }
-// }
-
-// std::string ripemd160(const std::string& input) {
-//     // Дополнение входных данных
-//     uint64_t total_bits = input.length() * 8;
-//     uint32_t extra_bits = (448 - total_bits % 512 + 512) % 512;
-//     uint32_t padding_size = (extra_bits + 64) / 8;
-//     std::string padding(padding_size, '\0');
-//     padding[0] = 0x80;
-//     for (int i = 1; i < padding_size - 8; ++i) {
-//         padding[i] = 0x00;
-//     }
-//     // Добавление длины исходного сообщения в битах
-//     for (int i = 0; i < 8; ++i) {
-//         padding[padding_size - 8 + i] = (total_bits >> (i * 8)) & 0xFF;
-//     }
-//     // Инициализация переменных состояния
-//     uint32_t h0 = 0x67452301;
-//     uint32_t h1 = 0xefcdab89;
-//     uint32_t h2 = 0x98badcfe;
-//     uint32_t h3 = 0x10325476;
-//     uint32_t h4 = 0xc3d2e1f0;
-//     // Обработка блоков сообщения
-//     for (size_t i = 0; i < padding_size; i += 64) {
-//         uint32_t W[16];
-//         // Заполнение массива слов
-//         for (int j = 0; j < 16; ++j) {
-//             W[j] = (uint32_t(padding[i + 4 * j]) << 24) | (uint32_t(padding[i + 4 * j + 1]) << 16) |
-//                    (uint32_t(padding[i + 4 * j + 2]) << 8) | (uint32_t(padding[i + 4 * j + 3]));
-//         }
-//         uint32_t A = h0, B = h1, C = h2, D = h3, E = h4;
-//         // Раунды сжатия
-//         compress(A, B, C, D, E, W, R[0], S[0], &K[0], 16);
-//         compress(E, A, B, C, D, W, R[1], S[1], &K[1], 16);
-//         compress(D, E, A, B, C, W, R[2], S[2], &K[2], 16);
-//         compress(C, D, E, A, B, W, R[3], S[3], &K[3], 16);
-//         compress(B, C, D, E, A, W, R[4], S[4], &K[4], 16);
-//         // Обновление хеша
-//         h0 += A;
-//         h1 += B;
-//         h2 += C;
-//         h3 += D;
-//         h4 += E;
-//     }
-//     // Форматирование хеша в строку
-//     std::stringstream ss;
-//     ss << std::hex << std::setw(8) << std::setfill('0') << h0
-//        << std::hex << std::setw(8) << std::setfill('0') << h1
-//        << std::hex << std::setw(8) << std::setfill('0') << h2
-//        << std::hex << std::setw(8) << std::setfill('0') << h3
-//        << std::hex << std::setw(8) << std::setfill('0') << h4;
-//     return ss.str();
-// }
-
-// int main() {
-//     std::string input = "The quick brown fox jumps over the lazy dog";
-//     std::string hash = ripemd160(input);
-//     std::cout << "RIPEMD-160 hash of \"" << input << "\": " << hash << std::endl;
-//     return 0;
-// }
 
 uint32_t rols(uint32_t x, uint32_t s) {
     return (x << s) | (x >> (32 - s));
@@ -284,55 +146,128 @@ void ripemd160(const uint32_t *message, uint32_t *digest) {
     digest[4] = h4;
 }
 
+// void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
+//     // Добавляем 1 бит
+//     padded_message[input_len] = 0x80;
+
+//     // Заполняем оставшиеся биты нулями
+//     for (size_t i = input_len + 1; i < 64; ++i) {
+//         padded_message[i] = 0;
+//     }
+
+//     // Добавляем длину сообщения (в битах) в виде двух 32-битных слов
+//     uint64_t bit_length = input_len * 8;
+//     for (int i = 0; i < 8; ++i) {
+//         padded_message[56 + i] = (uint8_t)(bit_length >> (i * 8));
+//     }
+// }
+
 void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
-    // Добавляем 1 бит
-    padded_message[0] = 0x80;
+    // Добавляем 1 бит после последнего байта входного сообщения
+    padded_message[input_len] = 0x80;
 
-    // Заполняем оставшиеся биты нулями
-    memset(padded_message + 1, 0, 56);
+    // Заполняем оставшиеся биты нулями до добавления длины сообщения
+    for (size_t i = input_len + 1; i < 64; ++i) {
+        padded_message[i] = 0;
+    }
 
-    // Записываем длину исходного сообщения (в битах) в конец расширенного сообщения
+    // Добавляем длину сообщения (в битах) в виде двух 32-битных слов
     uint64_t bit_length = input_len * 8;
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; ++i) {
         padded_message[63 - i] = (uint8_t)(bit_length >> (i * 8));
     }
 }
 
-// 
+
+
+
+// int main() {
+//     // Пример входных данных для хеширования
+//     const char *message = "The quick brown fox jumps over the lazy dog";
+//     uint32_t digest[5]; // Массив для хранения результата хеширования
+
+
+//     // Преобразование входных данных в формат uint32_t
+
+//     size_t message_len = strlen(message);
+//     uint32_t message_words[16];
+//     memset(message_words, 0, sizeof(message_words)); // Заполняем нулями
+//     for (size_t i = 0; i < message_len; i++) {
+//         message_words[i / 4] |= (uint32_t)message[i] << (i % 4 * 8);
+//     }
+
+//     // Расширение сообщения до длины, кратной 512 битам
+//     // Добавляем бит "1"
+//     message_words[message_len / 4] |= 0x80 << ((message_len % 4) * 8);
+//     // Добавляем биты "0" до длины, кратной 512 битам
+//     size_t padding_len = ((message_len + 9) % 64 < 56) ? 56 - (message_len + 9) % 64 : 120 - (message_len + 9) % 64;
+//     memset(&message_words[(message_len + 8) / 4], 0, padding_len);
+
+//     // Вычисляем длину сообщения в битах
+//     uint64_t message_len_bits = (uint64_t)message_len * 8;
+
+//     // Добавляем длину сообщения в конец (в битах)
+//     message_words[14] = (uint32_t)(message_len_bits & 0xFFFFFFFF);
+//     message_words[15] = (uint32_t)((message_len_bits >> 32) & 0xFFFFFFFF);
+
+//     // Выполнение хеширования
+//     ripemd160(message_words, digest);
+
+//     // Вывод результата хеширования
+//     printf("Message: %s\n", message);
+//     printf("RIPEMD-160 Hash: %08x %08x %08x %08x %08x\n", digest[0], digest[1], digest[2], digest[3], digest[4]);
+
+//     return 0;
+// }
 
 int main() {
-    // Пример входных данных для хеширования
-    const char *message = "The quick brown fox jumps over the lazy dog";
-    uint32_t digest[5]; // Массив для хранения результата хеширования
+    // Входное сообщение для хеширования
+    const uint8_t input[] = "The quick brown fox jumps over the lazy dog";
+    size_t input_len = strlen((char*)input);
 
-    // Преобразование входных данных в формат uint32_t
-    size_t message_len = strlen(message);
-    uint32_t message_words[16];
-    memset(message_words, 0, sizeof(message_words)); // Заполняем нулями
-    for (size_t i = 0; i < message_len; i++) {
-        message_words[i / 4] |= (uint32_t)message[i] << (i % 4 * 8);
+    // Вычисляем длину расширенного сообщения
+    size_t padded_len = ((input_len + 8) / 64 + 1) * 64;
+
+    // Выделяем память под расширенное сообщение
+    uint8_t* padded_message = new uint8_t[padded_len];
+
+    std::cout << "Input_len: " << input_len << std::endl;
+    std::cout << "Padded_len: " << padded_len << std::endl;
+
+    // Копируем входное сообщение в расширенное и дополняем его нулями и длиной
+    memcpy(padded_message, input, input_len);
+    std::cout << "Padded message: " << padded_message << std::endl;
+    for (int i = 0; i < padded_len; ++i) {
+        std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)padded_message[i];
     }
+    std::cout << std::endl;
 
-    // Расширение сообщения до длины, кратной 512 битам
-    // Добавляем бит "1"
-    message_words[message_len / 4] |= 0x80 << ((message_len % 4) * 8);
-    // Добавляем биты "0" до длины, кратной 512 битам
-    size_t padding_len = ((message_len + 9) % 64 < 56) ? 56 - (message_len + 9) % 64 : 120 - (message_len + 9) % 64;
-    memset(&message_words[(message_len + 8) / 4], 0, padding_len);
+    pad_message(input, input_len, padded_message);
+    std::cout << "Padded message: " << padded_message << std::endl;
+    
+    for (int i = 0; i < padded_len; ++i) {
+        std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)padded_message[i];
+    }
+    std::cout << std::endl;
 
-    // Вычисляем длину сообщения в битах
-    uint64_t message_len_bits = (uint64_t)message_len * 8;
+    // Преобразуем расширенное сообщение в массив 32-битных слов
+    uint32_t* message = reinterpret_cast<uint32_t*>(padded_message);
 
-    // Добавляем длину сообщения в конец (в битах)
-    message_words[14] = (uint32_t)(message_len_bits & 0xFFFFFFFF);
-    message_words[15] = (uint32_t)((message_len_bits >> 32) & 0xFFFFFFFF);
+    // Выделяем память под результат хеширования
+    uint32_t digest[5];
 
-    // Выполнение хеширования
-    ripemd160(message_words, digest);
+    // Вызываем функцию хеширования RIPEMD-160
+    ripemd160(message, digest);
 
-    // Вывод результата хеширования
-    printf("Message: %s\n", message);
-    printf("RIPEMD-160 Hash: %08x %08x %08x %08x %08x\n", digest[0], digest[1], digest[2], digest[3], digest[4]);
+    // Выводим результат хеширования
+    std::cout << "RIPEMD-160 hash of \"" << input << "\": ";
+    for (int i = 0; i < 5; ++i) {
+        std::cout << std::hex << std::setw(8) << std::setfill('0') << digest[i];
+    }
+    std::cout << std::endl;
+
+    // Освобождаем выделенную память
+    delete[] padded_message;
 
     return 0;
 }
