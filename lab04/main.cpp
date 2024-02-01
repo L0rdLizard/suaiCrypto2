@@ -162,63 +162,88 @@ void ripemd160(const uint32_t *message, uint32_t *digest) {
 //     }
 // }
 
+// void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
+//     // Добавляем 1 бит после последнего байта входного сообщения
+//     padded_message[input_len] = 0x80;
+
+//     // Заполняем оставшиеся биты нулями до добавления длины сообщения
+//     for (size_t i = input_len + 1; i < 64; ++i) {
+//         padded_message[i] = 0;
+//     }
+
+//     // Добавляем длину сообщения (в битах) в виде двух 32-битных слов
+//     uint64_t bit_length = input_len * 8;
+//     for (int i = 0; i < 8; ++i) {
+//         padded_message[63 - i] = (uint8_t)(bit_length >> (i * 8));
+//     }
+// }
+
+// void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
+//     // Добавляем 1 бит после последнего байта входного сообщения
+//     padded_message[input_len] = 0x80;
+
+//     // Заполняем оставшиеся биты нулями до добавления длины сообщения
+//     size_t padding_len = ((input_len + 8) % 64 < 56) ? 56 - (input_len + 8) % 64 : 120 - (input_len + 8) % 64;
+//     memset(&padded_message[input_len + 1], 0, padding_len);
+
+//     // Добавляем длину сообщения (в битах) в виде двух 32-битных слов
+//     uint64_t bit_length = input_len * 8;
+//     for (int i = 0; i < 8; ++i) {
+//         padded_message[input_len + padding_len + i] = (uint8_t)(bit_length >> (i * 8));
+//     }
+// }
+
+// void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
+//     // Добавляем 1 бит после последнего байта входного сообщения
+//     padded_message[input_len] = 0x80;
+
+//     // Заполняем оставшиеся биты нулями до добавления длины сообщения
+//     size_t padding_len = ((input_len + 8) % 64 < 56) ? 56 - (input_len + 8) % 64 : 120 - (input_len + 8) % 64;
+//     memset(&padded_message[input_len + 1], 0, padding_len);
+
+//     // Добавляем длину сообщения (в битах) в виде двух 32-битных слов
+//     uint64_t bit_length = input_len * 8;
+//     for (int i = 0; i < 8; ++i) {
+//         padded_message[input_len + padding_len + i] = (uint8_t)(bit_length >> (i * 8));
+//     }
+
+//     // Преобразуем последовательность байтов в little-endian порядке в 32-битные слова
+//     for (size_t i = 0; i < input_len; i += 4) {
+//         uint32_t word = 0;
+//         for (size_t j = 0; j < 4 && i + j < input_len; ++j) {
+//             word |= (uint32_t)padded_message[i + j] << (j * 8);
+//         }
+//         padded_message[i / 4] = word;
+//     }
+// }
+
 void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
     // Добавляем 1 бит после последнего байта входного сообщения
     padded_message[input_len] = 0x80;
 
     // Заполняем оставшиеся биты нулями до добавления длины сообщения
-    for (size_t i = input_len + 1; i < 64; ++i) {
-        padded_message[i] = 0;
-    }
+    size_t padding_len = ((input_len + 8) % 64 < 56) ? 56 - (input_len + 8) % 64 : 120 - (input_len + 8) % 64;
+    memset(&padded_message[input_len + 1], 0, padding_len);
 
     // Добавляем длину сообщения (в битах) в виде двух 32-битных слов
     uint64_t bit_length = input_len * 8;
     for (int i = 0; i < 8; ++i) {
-        padded_message[63 - i] = (uint8_t)(bit_length >> (i * 8));
+        padded_message[input_len + padding_len + i] = (uint8_t)(bit_length >> (i * 8));
     }
+
+    // Преобразуем последовательность байтов в little-endian порядке в 32-битные слова
+    for (size_t i = 0; i < input_len; i += 4) {
+        uint32_t word = 0;
+        for (size_t j = 0; j < 4 && i + j < input_len; ++j) {
+            word |= (uint32_t)padded_message[i + j] << (j * 8);
+        }
+        padded_message[i / 4] = word;
+    }
+
+    // Дополняем блок нулевыми байтами до конца блока
+    memset(&padded_message[input_len + padding_len + 8], 0, 64 - (input_len + padding_len + 8));
 }
 
-
-
-
-// int main() {
-//     // Пример входных данных для хеширования
-//     const char *message = "The quick brown fox jumps over the lazy dog";
-//     uint32_t digest[5]; // Массив для хранения результата хеширования
-
-
-//     // Преобразование входных данных в формат uint32_t
-
-//     size_t message_len = strlen(message);
-//     uint32_t message_words[16];
-//     memset(message_words, 0, sizeof(message_words)); // Заполняем нулями
-//     for (size_t i = 0; i < message_len; i++) {
-//         message_words[i / 4] |= (uint32_t)message[i] << (i % 4 * 8);
-//     }
-
-//     // Расширение сообщения до длины, кратной 512 битам
-//     // Добавляем бит "1"
-//     message_words[message_len / 4] |= 0x80 << ((message_len % 4) * 8);
-//     // Добавляем биты "0" до длины, кратной 512 битам
-//     size_t padding_len = ((message_len + 9) % 64 < 56) ? 56 - (message_len + 9) % 64 : 120 - (message_len + 9) % 64;
-//     memset(&message_words[(message_len + 8) / 4], 0, padding_len);
-
-//     // Вычисляем длину сообщения в битах
-//     uint64_t message_len_bits = (uint64_t)message_len * 8;
-
-//     // Добавляем длину сообщения в конец (в битах)
-//     message_words[14] = (uint32_t)(message_len_bits & 0xFFFFFFFF);
-//     message_words[15] = (uint32_t)((message_len_bits >> 32) & 0xFFFFFFFF);
-
-//     // Выполнение хеширования
-//     ripemd160(message_words, digest);
-
-//     // Вывод результата хеширования
-//     printf("Message: %s\n", message);
-//     printf("RIPEMD-160 Hash: %08x %08x %08x %08x %08x\n", digest[0], digest[1], digest[2], digest[3], digest[4]);
-
-//     return 0;
-// }
 
 int main() {
     // Входное сообщение для хеширования
