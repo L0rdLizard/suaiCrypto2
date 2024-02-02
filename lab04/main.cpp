@@ -217,31 +217,30 @@ void ripemd160(const uint32_t *message, uint32_t *digest) {
 //     }
 // }
 
-void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
-    // Добавляем 1 бит после последнего байта входного сообщения
-    padded_message[input_len] = 0x80;
+// void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
+//     // Добавляем бит "1" после последнего байта входного сообщения
+//     padded_message[input_len] = 0x80;
 
-    // Заполняем оставшиеся биты нулями до добавления длины сообщения
-    size_t padding_len = ((input_len + 8) % 64 < 56) ? 56 - (input_len + 8) % 64 : 120 - (input_len + 8) % 64;
-    memset(&padded_message[input_len + 1], 0, padding_len);
+//     // Заполняем оставшиеся биты нулями до достижения необходимой длины паддинга
+//     size_t padding_len = (input_len % 64 < 56) ? 56 - input_len % 64 : 120 - input_len % 64;
+//     memset(&padded_message[input_len + 1], 0, padding_len);
 
-    // Добавляем длину сообщения (в битах) в виде двух 32-битных слов
-    uint64_t bit_length = input_len * 8;
-    for (int i = 0; i < 8; ++i) {
-        padded_message[input_len + padding_len + i] = (uint8_t)(bit_length >> (i * 8));
-    }
+//     // Добавляем длину исходного сообщения в битах (в виде двух 32-битных слов)
+//     uint64_t bit_length = input_len * 8;
+//     for (int i = 0; i < 8; ++i) {
+//         padded_message[(input_len + padding_len + 8) + i] = (uint8_t)(bit_length >> (56 - i * 8));
+//     }
+// }
 
-    // Преобразуем последовательность байтов в little-endian порядке в 32-битные слова
-    for (size_t i = 0; i < input_len; i += 4) {
-        uint32_t word = 0;
-        for (size_t j = 0; j < 4 && i + j < input_len; ++j) {
-            word |= (uint32_t)padded_message[i + j] << (j * 8);
-        }
-        padded_message[i / 4] = word;
-    }
 
-    // Дополняем блок нулевыми байтами до конца блока
-    memset(&padded_message[input_len + padding_len + 8], 0, 64 - (input_len + padding_len + 8));
+#include <cstring>
+
+void pad_message(const uint8_t* input, size_t input_len, uint8_t* padded_message) {
+    // Копируем входное сообщение в расширенное
+    memcpy(padded_message + input_len, input, 1);
+    
+    // Заполняем оставшуюся часть нулями
+    memset(padded_message + input_len + 1, 0, 64 - input_len - 1);
 }
 
 
