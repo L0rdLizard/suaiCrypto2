@@ -70,27 +70,27 @@ const uint32_t SS[5][16] = {
 };
 
 uint32_t F(uint32_t x, uint32_t y, uint32_t z) {
-    std::cout << "F" << std::endl;
+    // std::cout << "F" << std::endl;
     return x ^ y ^ z;
 }
 
 uint32_t G(uint32_t x, uint32_t y, uint32_t z) {
-    std::cout << "G" << std::endl;
+    // std::cout << "G" << std::endl;
     return (x & y) | (~x & z);
 }
 
 uint32_t H(uint32_t x, uint32_t y, uint32_t z) {
-    std::cout << "H" << std::endl;
+    // std::cout << "H" << std::endl;
     return (x | ~y) ^ z;
 }
 
 uint32_t I(uint32_t x, uint32_t y, uint32_t z) {
-    std::cout << "I" << std::endl;
+    // std::cout << "I" << std::endl;
     return (x & z) | (y & ~z);
 }
 
 uint32_t J(uint32_t x, uint32_t y, uint32_t z) {
-    std::cout << "J" << std::endl;
+    // std::cout << "J" << std::endl;
     return x ^ (y | ~z);
 }
 
@@ -145,7 +145,7 @@ void ripemd160(const uint32_t *message, uint32_t *digest) {
         
         for (int j = 0; j < 16; j++) {
 
-            T = rols(A + f((j * i), B, C, D) + message[R[i][j]] + K[i], S[i][j]) + E;
+            T = rols(A + f((j * (i+1)), B, C, D) + message[R[i][j]] + K[i], S[i][j]) + E;
             A = E; E = D; D = rol10(C); C = B; B = T;
             
             T = rols(A_prime + f_prime((j * (i+1)), B_prime, C_prime, D_prime) + message[RR[i][j]] + KK[i], SS[i][j]) + E_prime;
@@ -265,7 +265,7 @@ void ripemd160_8(const uint8_t *message, uint8_t *digest) {
 
 // void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
 //     // Добавляем бит "1" после последнего байта входного сообщения
-    // padded_message[input_len] = 0x80;
+//     padded_message[input_len] = 0x80;
 
 //     // Заполняем оставшиеся биты нулями до достижения необходимой длины паддинга
 //     size_t padding_len = (input_len % 64 < 56) ? 56 - input_len % 64 : 120 - input_len % 64;
@@ -279,7 +279,6 @@ void ripemd160_8(const uint8_t *message, uint8_t *digest) {
 // }
 
 
-
 // void pad_message(const uint8_t* input, size_t input_len, uint8_t* padded_message) {
 //     // Копируем входное сообщение в расширенное
 //     memcpy(padded_message + input_len, input, 1);
@@ -288,111 +287,135 @@ void ripemd160_8(const uint8_t *message, uint8_t *digest) {
 //     memset(padded_message + input_len + 1, 0, 64 - input_len - 1);
 // }
 
-
-// int main() {
-//     // Входное сообщение для хеширования
-//     const uint8_t input[] = "The quick brown fox jumps over the lazy dog";
-//     size_t input_len = strlen((char*)input);
-
-//     // Вычисляем длину расширенного сообщения
-//     size_t padded_len = ((input_len + 8) / 64 + 1) * 64;
-
-//     // Выделяем память под расширенное сообщение
-//     uint8_t* padded_message = new uint8_t[padded_len];
-//     std::cout << "Padded message: " << "<" << padded_message << ">" << std::endl;
-
-//     std::cout << "Input_len: " << input_len << std::endl;
-//     std::cout << "Padded_len: " << padded_len << std::endl;
-//     std::cout << "input: " << "<" << input << ">" << std::endl;
-
-//     // Копируем входное сообщение в расширенное и дополняем его нулями и длиной
-//     memcpy(padded_message, input, input_len + 1);
-//     std::cout << "after memcp: " << padded_message << std::endl;
-
-//     for (int i = 0; i < padded_len; ++i) {
-//         std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)padded_message[i];
-//     }
-//     std::cout << std::endl;
-//     std::cout << std::endl;
-
-//     pad_message(input, input_len, padded_message);
-//     std::cout  << "Padded message: " << "<" << padded_message << ">" << std::endl;
+void pad_message(const uint8_t* input, size_t input_len, uint8_t* padded_message) {
+    // Копируем входное сообщение в расширенное
+    memcpy(padded_message, input, input_len);
     
-//     for (int i = 0; i < padded_len; ++i) {
-//         std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)padded_message[i];
-//     }
-//     std::cout << std::endl;
-//     std::cout << std::endl;
+    size_t padded_len = ((input_len + 8) / 64 + 1) * 64;
+    // Заполняем оставшуюся часть нулями
+    memset(padded_message + input_len, 0, 64 - (input_len % 64));
 
-//     // Преобразуем расширенное сообщение в массив 32-битных слов
-//     uint32_t* message = reinterpret_cast<uint32_t*>(padded_message);
-
-//     // Выделяем память под результат хеширования
-//     uint32_t digest[5];
-
-//     // Вызываем функцию хеширования RIPEMD-160
-//     ripemd160(message, digest);
-
-//     // Выводим результат хеширования
-//     std::cout << "RIPEMD-160 hash of \"" << input << "\": ";
-//     for (int i = 0; i < 5; ++i) {
-//         std::cout << std::hex << std::setw(8) << std::setfill('0') << digest[i];
-//     }
-//     std::cout << std::endl;
-//     std::cout << "Right hash of \" The quick brown fox jumps over the lazy dog \": 37f332f68db77bd9d7edd4969571ad671cf9dd3b" << std::endl;
-
-//     // Освобождаем выделенную память
-//     delete[] padded_message;
-
-//     return 0;
-// }
-
-std::string uint8_to_hex_string(const uint8_t *v, const size_t s) {
-  std::stringstream ss;
-
-  ss << std::hex << std::setfill('0');
-
-  for (int i = 0; i < s; i++) {
-    ss << std::hex << std::setw(2) << static_cast<int>(v[i]);
-  }
-
-  return ss.str();
+    // Добавляем длину сообщения в конец расширенного сообщения
+    uint64_t bit_length = input_len * 8;
+    padded_message[padded_len - 8] = bit_length & 0xFF;
+    padded_message[padded_len - 7] = (bit_length >> 8) & 0xFF;
+    padded_message[padded_len - 6] = (bit_length >> 16) & 0xFF;
+    padded_message[padded_len - 5] = (bit_length >> 24) & 0xFF;
+    padded_message[padded_len - 4] = (bit_length >> 32) & 0xFF;
+    padded_message[padded_len - 3] = (bit_length >> 40) & 0xFF;
+    padded_message[padded_len - 2] = (bit_length >> 48) & 0xFF;
+    padded_message[padded_len - 1] = (bit_length >> 56) & 0xFF;
 }
 
-std::string uint32_to_hex_string(const uint32_t *v, const size_t s) {
-    std::stringstream ss;
-
-    ss << std::hex << std::setfill('0');
-
-    for (int i = 0; i < s; i++) {
-        ss << std::hex << std::setw(8) << v[i];
-    }
-
-    return ss.str();
-}
 
 
 int main() {
-  size_t msglen = 32;
-  uint8_t msg[msglen];
+    // Входное сообщение для хеширования
+    const uint8_t input[] = "The quick brown fox jumps over the lazy dog";
+    // const uint8_t input[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
-  size_t hashlen = 20;
-  uint8_t hash[hashlen];
+    size_t input_len = strlen((char*)input);
 
-  std::string str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-//   std::string str = "The quick brown fox jumps over the lazy dog";
+    // Вычисляем длину расширенного сообщения
+    size_t padded_len = ((input_len + 8) / 64 + 1) * 64;
 
-  memcpy(msg, str.c_str(), sizeof(msg));
+    // Выделяем память под расширенное сообщение
+    uint8_t* padded_message = new uint8_t[padded_len];
+    std::cout << "Padded message: " << "<" << padded_message << ">" << std::endl;
 
-  ripemd160_8(msg, hash);
+    std::cout << "Input_len: " << input_len << std::endl;
+    std::cout << "Padded_len: " << padded_len << std::endl;
+    std::cout << "input: " << "<" << input << ">" << std::endl;
 
-  std::string hexstr = uint8_to_hex_string(hash, hashlen);
+    // Копируем входное сообщение в расширенное и дополняем его нулями и длиной
+    memcpy(padded_message, input, input_len + 1);
+    std::cout << "after memcp: " << padded_message << std::endl;
 
-  std::cout << hexstr << std::endl;
-  // e6d64710683e82853342e24f011bc77af21884ad
+    for (int i = 0; i < padded_len; ++i) {
+        std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)padded_message[i];
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;
 
-  return 0;
+    pad_message(input, input_len, padded_message);
+    std::cout  << "Padded message: " << "<" << padded_message << ">" << std::endl;
+    
+    for (int i = 0; i < padded_len; ++i) {
+        std::cout << std::hex << std::setw(2) << std::setfill('0') << (int)padded_message[i];
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    // Преобразуем расширенное сообщение в массив 32-битных слов
+    uint32_t* message = reinterpret_cast<uint32_t*>(padded_message);
+
+    // Выделяем память под результат хеширования
+    uint32_t digest[5];
+
+    // Вызываем функцию хеширования RIPEMD-160
+    ripemd160(message, digest);
+
+    // Выводим результат хеширования
+    std::cout << "RIPEMD-160 hash of \"" << input << "\": ";
+    for (int i = 0; i < 5; ++i) {
+        std::cout << std::hex << std::setw(8) << std::setfill('0') << digest[i];
+    }
+    std::cout << std::endl;
+    std::cout << "Right hash of \"The quick brown fox jumps over the lazy dog\": 37f332f68db77bd9d7edd4969571ad671cf9dd3b" << std::endl;
+
+    // Освобождаем выделенную память
+    delete[] padded_message;
+
+    return 0;
 }
+
+// std::string uint8_to_hex_string(const uint8_t *v, const size_t s) {
+//   std::stringstream ss;
+
+//   ss << std::hex << std::setfill('0');
+
+//   for (int i = 0; i < s; i++) {
+//     ss << std::hex << std::setw(2) << static_cast<int>(v[i]);
+//   }
+
+//   return ss.str();
+// }
+
+// std::string uint32_to_hex_string(const uint32_t *v, const size_t s) {
+//     std::stringstream ss;
+
+//     ss << std::hex << std::setfill('0');
+
+//     for (int i = 0; i < s; i++) {
+//         ss << std::hex << std::setw(8) << v[i];
+//     }
+
+//     return ss.str();
+// }
+
+
+// int main() {
+//   size_t msglen = 32;
+//   uint8_t msg[msglen];
+
+//   size_t hashlen = 20;
+//   uint8_t hash[hashlen];
+
+//   std::string str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+// //   std::string str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+// //   std::string str = "The quick brown fox jumps over the lazy dog";
+
+//   memcpy(msg, str.c_str(), sizeof(msg));
+
+//   ripemd160_8(msg, hash);
+
+//   std::string hexstr = uint8_to_hex_string(hash, hashlen);
+
+//   std::cout << hexstr << std::endl;
+//   // e6d64710683e82853342e24f011bc77af21884ad
+
+//   return 0;
+// }
 
 // RIPEMD-160("The quick brown fox jumps over the lazy dog") =
 //  37f332f68db77bd9d7edd4969571ad671cf9dd3b
