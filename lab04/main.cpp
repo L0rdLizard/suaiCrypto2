@@ -135,27 +135,29 @@ void ripemd160(const uint32_t *message, uint32_t *digest) {
     uint32_t h2 = 0x98badcfe;
     uint32_t h3 = 0x10325476;
     uint32_t h4 = 0xc3d2e1f0;
-    uint32_t A = h0, B = h1, C = h2, D = h3, E = h4;
-    uint32_t A_prime = h0, B_prime = h1, C_prime = h2, D_prime = h3, E_prime = h4;
+    // uint32_t A = h0, B = h1, C = h2, D = h3, E = h4;
+    // uint32_t A_prime = h0, B_prime = h1, C_prime = h2, D_prime = h3, E_prime = h4;
+    uint32_t A, B , C, D, E;
+    uint32_t A_prime, B_prime, C_prime, D_prime, E_prime;
     uint32_t T = 0, T_prime = 0;
 
-    for (int i = 0; i < 5; i++) {
+    for (int k = 0; k < 1; k++) {
         A = h0, B = h1, C = h2, D = h3, E = h4;
         A_prime = h0, B_prime = h1, C_prime = h2, D_prime = h3, E_prime = h4;
         
-        for (int j = 0; j < 16; j++) {
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 16; j++) {
+                int curJ = ((j+1) * (i+1)) - 1;
+                // std::cout << "curJ: " << std::dec << curJ << std::endl;
 
-            T = rols(A + f((j * (i+1)), B, C, D) + message[R[i][j]] + K[i], S[i][j]) + E;
-            A = E; E = D; D = rol10(C); C = B; B = T;
-            
-            T = rols(A_prime + f_prime((j * (i+1)), B_prime, C_prime, D_prime) + message[RR[i][j]] + KK[i], SS[i][j]) + E_prime;
-            A_prime = E_prime; E_prime = D_prime; D_prime = rol10(C_prime); C_prime = B_prime; B_prime = T;
-
-            // T = rols(A + f(j, B, C, D) + message[R[i][j]] + K[i], S[i][j]) + E;
-            // T_prime = rols(A_prime + f_prime(j, B_prime, C_prime, D_prime) + message[RR[i][j]] + KK[i], SS[i][j]) + E_prime;
-
-            // A = E; E = D; D = rol10(C); C = B; B = T;
-            // A_prime = E_prime; E_prime = D_prime; D_prime = rol10(C_prime); C_prime = B_prime; B_prime = T_prime;
+                T = rols(A + f(curJ, B, C, D) + message[R[i][j]] + K[i], S[i][j]) + E;
+                A = E; E = D; D = rol10(C); C = B; B = T;
+                
+                T = rols(A_prime + f_prime(curJ, B_prime, C_prime, D_prime) + message[RR[i][j]] + KK[i], SS[i][j]) + E_prime;
+                A_prime = E_prime; E_prime = D_prime; D_prime = rol10(C_prime); C_prime = B_prime; B_prime = T;
+                // std::cout << "K[i]: " << K[i] << std::endl;
+                // std::cout << "R[i][j]: " << R[i][j] << std::endl;
+            }
         }
 
         T = h1 + C + D_prime;
@@ -172,6 +174,52 @@ void ripemd160(const uint32_t *message, uint32_t *digest) {
     digest[3] = h3;
     digest[4] = h4;
 }
+
+// void ripemd160(const uint32_t *message, uint32_t *digest) {
+//     uint32_t h0 = 0x67452301;
+//     uint32_t h1 = 0xefcdab89;
+//     uint32_t h2 = 0x98badcfe;
+//     uint32_t h3 = 0x10325476;
+//     uint32_t h4 = 0xc3d2e1f0;
+//     uint32_t A = h0, B = h1, C = h2, D = h3, E = h4;
+//     uint32_t A_prime = h0, B_prime = h1, C_prime = h2, D_prime = h3, E_prime = h4;
+//     uint32_t T = 0, T_prime = 0;
+
+//     for (int i = 0; i < 5; i++) {
+//         A = h0, B = h1, C = h2, D = h3, E = h4;
+//         A_prime = h0, B_prime = h1, C_prime = h2, D_prime = h3, E_prime = h4;
+        
+//         for (int j = 0; j < 16; j++) {
+
+//             T = rols(A + f((j * (i+1)), B, C, D) + message[R[i][j]] + K[i], S[i][j]) + E;
+//             A = E; E = D; D = rol10(C); C = B; B = T;
+            
+//             T = rols(A_prime + f_prime((j * (i+1)), B_prime, C_prime, D_prime) + message[RR[i][j]] + KK[i], SS[i][j]) + E_prime;
+//             A_prime = E_prime; E_prime = D_prime; D_prime = rol10(C_prime); C_prime = B_prime; B_prime = T;
+//             std::cout << "K[i]: " << K[i] << std::endl;
+//             std::cout << "R[i][j]: " << R[i][j] << std::endl;
+
+//             // T = rols(A + f(j, B, C, D) + message[R[i][j]] + K[i], S[i][j]) + E;
+//             // T_prime = rols(A_prime + f_prime(j, B_prime, C_prime, D_prime) + message[RR[i][j]] + KK[i], SS[i][j]) + E_prime;
+
+//             // A = E; E = D; D = rol10(C); C = B; B = T;
+//             // A_prime = E_prime; E_prime = D_prime; D_prime = rol10(C_prime); C_prime = B_prime; B_prime = T_prime;
+//         }
+
+//         T = h1 + C + D_prime;
+//         h1 = h2 + D + E_prime;
+//         h2 = h3 + E + A_prime;
+//         h3 = h4 + A + B_prime;
+//         h4 = h0 + B + C_prime;
+//         h0 = T;
+//     }
+
+//     digest[0] = h0;
+//     digest[1] = h1;
+//     digest[2] = h2;
+//     digest[3] = h3;
+//     digest[4] = h4;
+// }
 
 void ripemd160_8(const uint8_t *message, uint8_t *digest) {
     uint32_t h0 = 0x67452301;
@@ -215,21 +263,21 @@ void ripemd160_8(const uint8_t *message, uint8_t *digest) {
 }
 
 
-// void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
-//     // Добавляем 1 бит
-//     padded_message[input_len] = 0x80;
+void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
+    // Добавляем 1 бит
+    padded_message[input_len] = 0x80;
 
-//     // Заполняем оставшиеся биты нулями
-//     for (size_t i = input_len + 1; i < 64; ++i) {
-//         padded_message[i] = 0;
-//     }
+    // Заполняем оставшиеся биты нулями
+    for (size_t i = input_len + 1; i < 64; ++i) {
+        padded_message[i] = 0;
+    }
 
-//     // Добавляем длину сообщения (в битах) в виде двух 32-битных слов
-//     uint64_t bit_length = input_len * 8;
-//     for (int i = 0; i < 8; ++i) {
-//         padded_message[56 + i] = (uint8_t)(bit_length >> (i * 8));
-//     }
-// }
+    // Добавляем длину сообщения (в битах) в виде двух 32-битных слов
+    uint64_t bit_length = input_len * 8;
+    for (int i = 0; i < 8; ++i) {
+        padded_message[56 + i] = (uint8_t)(bit_length >> (i * 8));
+    }
+}
 
 // void pad_message(const uint8_t *input, size_t input_len, uint8_t *padded_message) {
 //     // Добавляем 1 бит после последнего байта входного сообщения
@@ -287,32 +335,37 @@ void ripemd160_8(const uint8_t *message, uint8_t *digest) {
 //     memset(padded_message + input_len + 1, 0, 64 - input_len - 1);
 // }
 
-void pad_message(const uint8_t* input, size_t input_len, uint8_t* padded_message) {
-    // Копируем входное сообщение в расширенное
-    memcpy(padded_message, input, input_len);
+// void pad_message(const uint8_t* input, size_t input_len, uint8_t* padded_message) {
+//     // Копируем входное сообщение в расширенное
+//     memcpy(padded_message, input, input_len);
     
-    size_t padded_len = ((input_len + 8) / 64 + 1) * 64;
-    // Заполняем оставшуюся часть нулями
-    memset(padded_message + input_len, 0, 64 - (input_len % 64));
+//     // Вычисляем длину расширенного сообщения
+//     size_t padded_len = ((input_len + 72) / 64 + 1) * 64;
 
-    // Добавляем длину сообщения в конец расширенного сообщения
-    uint64_t bit_length = input_len * 8;
-    padded_message[padded_len - 8] = bit_length & 0xFF;
-    padded_message[padded_len - 7] = (bit_length >> 8) & 0xFF;
-    padded_message[padded_len - 6] = (bit_length >> 16) & 0xFF;
-    padded_message[padded_len - 5] = (bit_length >> 24) & 0xFF;
-    padded_message[padded_len - 4] = (bit_length >> 32) & 0xFF;
-    padded_message[padded_len - 3] = (bit_length >> 40) & 0xFF;
-    padded_message[padded_len - 2] = (bit_length >> 48) & 0xFF;
-    padded_message[padded_len - 1] = (bit_length >> 56) & 0xFF;
-}
+//     // Добавляем бит 1
+//     padded_message[input_len] = 0x80;
+    
+//     // Заполняем оставшуюся часть нулями
+//     memset(padded_message + input_len + 1, 0, padded_len - input_len - 9);
+
+//     // Добавляем длину сообщения в битах в конец расширенного сообщения
+//     uint64_t bit_length = input_len * 8;
+//     padded_message[padded_len - 8] = bit_length & 0xFF;
+//     padded_message[padded_len - 7] = (bit_length >> 8) & 0xFF;
+//     padded_message[padded_len - 6] = (bit_length >> 16) & 0xFF;
+//     padded_message[padded_len - 5] = (bit_length >> 24) & 0xFF;
+//     padded_message[padded_len - 4] = (bit_length >> 32) & 0xFF;
+//     padded_message[padded_len - 3] = (bit_length >> 40) & 0xFF;
+//     padded_message[padded_len - 2] = (bit_length >> 48) & 0xFF;
+//     padded_message[padded_len - 1] = (bit_length >> 56) & 0xFF;
+// }
 
 
 
 int main() {
     // Входное сообщение для хеширования
     const uint8_t input[] = "The quick brown fox jumps over the lazy dog";
-    // const uint8_t input[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    // const uint8_t input[] = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
     size_t input_len = strlen((char*)input);
 
@@ -353,6 +406,7 @@ int main() {
     uint32_t digest[5];
 
     // Вызываем функцию хеширования RIPEMD-160
+    std::cout <<  padded_len / 64 << std::endl;
     ripemd160(message, digest);
 
     // Выводим результат хеширования
