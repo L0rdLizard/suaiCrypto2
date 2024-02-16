@@ -36,5 +36,5 @@ public:
     bool read_file(char *fileName);                                                     //Чтение из файла
     bool write_file(char *fileName, string str);                                        //Запись в файл
 
-    string ripemd_160();                                                                //Алгоритм преобразования
+    string ripemd_160(string mess);                                                                //Алгоритм преобразования
 };
