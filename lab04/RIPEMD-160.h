@@ -2,6 +2,10 @@
 #include <iostream>                                                                     //Для cout
 #include <sstream>                                                                      //Для ostringstream и функции hex
 #include <fstream>                                                                      //Для файлов
+#include <vector>
+#include <cstdint>
+#include <ctime>
+#include <unordered_map>
 
 #define ROTATE_LEFT(x, n) (((x) << (n)) | ((x) >> (32-(n))))                            //Битовый сдвиг на n бит  
 

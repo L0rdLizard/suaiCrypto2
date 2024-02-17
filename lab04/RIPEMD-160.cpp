@@ -198,12 +198,9 @@ string RIPEMD_160::ripemd_160(string mess)                                      
 {
     unsigned int mess_size = mess.size();                                                   //Сохраняем размер исходного сообщения
 
-    message.resize(mess_size);
+    message = mess;
 
-    for (unsigned int i = 0; i < mess_size; i++)                                            //Переносим исходное сообщение в строку класса
-        message[i] = mess[i];
-
-    cout << "Message: " << message << endl;
+    // cout << "Message: " << message << endl;
     
     extension();                                                                            //Шаг 1 - Расширение сообщения
 
@@ -215,7 +212,7 @@ string RIPEMD_160::ripemd_160(string mess)                                      
 
     result << hex << inv(H0) << inv(H1) << inv(H2) << inv(H3) << inv(H4);                   //Шаг 5 - Результат в виде хэш-сообщения
 
-    cout << result.str() << endl;
+    // cout << result.str() << endl;
 
     return result.str();                                                                    //Возвращаем результат в виде хэш-сообщения
 }
