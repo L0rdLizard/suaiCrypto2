@@ -1,7 +1,6 @@
 #include "RIPEMD-160.h"
 
-uint16_t firstBits(string hash, unsigned int n)
-{
+uint16_t firstBits(string hash, unsigned int n) {
     string hashTail = hash.substr(hash.length() - 4);
 
     unsigned long long hashValue = std::stoull(hashTail, nullptr, 16);
@@ -10,35 +9,26 @@ uint16_t firstBits(string hash, unsigned int n)
     return firstTenBits;
 }
 
-std::string generateRandomMessage()
-{
-    // Инициализация генератора случайных чисел
-
-    // Генерация случайной длины сообщения (от 1 до 100 символов)
+std::string generateRandomMessage() {
     int length = std::rand() % 40 + 1;
 
-    // Генерация случайного сообщения
     std::string message;
-    for (int i = 0; i < length; ++i)
-    {
-        // Генерация случайного символа ASCII в диапазоне от 32 до 126 (включительно)
+    for (int i = 0; i < length; ++i) {
         char randomChar = static_cast<char>(std::rand() % 95 + 32);
+
         message.push_back(randomChar);
     }
 
     return message;
 }
 
-size_t countSteps(std::vector<uint16_t> y){
+size_t countSteps(std::vector<uint16_t> y) {
     size_t steps = 0;
 
-    for (int i = 0; i < y.size(); i++)
-    {
-        for (int j = i + 1; j < y.size(); j++)
-        {
+    for (int i = 0; i < y.size(); i++) {
+        for (int j = i + 1; j < y.size(); j++) {
             steps++;
-            if (y[i] == y[j])
-            {
+            if (y[i] == y[j]) {
                 return steps;
             }
         }
@@ -47,7 +37,8 @@ size_t countSteps(std::vector<uint16_t> y){
     return steps;
 }
 
-void writeArrayToFile(const int (&arr)[5][3][1000], std::string fileName1, std::string fileName2, std::string fileName3) {
+void writeArrayToFile(const int (&arr)[5][3][1000], std::string fileName1, std::string fileName2,
+                      std::string fileName3) {
     std::ofstream file1("data\\" + fileName1);
     std::ofstream file2("data\\" + fileName2);
     std::ofstream file3("data\\" + fileName3);
@@ -59,9 +50,9 @@ void writeArrayToFile(const int (&arr)[5][3][1000], std::string fileName1, std::
 
     for (int i = 0; i < 5; ++i) {
         for (int k = 0; k < 1000; ++k) {
-            file1 << arr[i][0][k] << " "; 
+            file1 << arr[i][0][k] << " ";
             file2 << arr[i][1][k] << " ";
-            file3 << arr[i][2][k] << " "; 
+            file3 << arr[i][2][k] << " ";
         }
         file1 << "\n";
         file2 << "\n";
@@ -75,8 +66,7 @@ void writeArrayToFile(const int (&arr)[5][3][1000], std::string fileName1, std::
     std::cout << "Succes!" << std::endl;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
     // if (argc != 2){
     //     cout << endl << "Usage: ./RIPEMD-160 file_in" << endl << endl;
@@ -117,30 +107,25 @@ int main(int argc, char **argv)
     int countS[5][3][1000];
     // std::vector<uint16_t> y = {};
 
-    for (int i = 0; i < 5; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 3; j++) {
             std::cout << "i = " << i << "; j = " << j << std::endl;
             uint16_t firstB = firstBits(massResult[j], masks[i]);
 
-            for (int k = 0; k < 1000; k++)
-            {
+            for (int k = 0; k < 1000; k++) {
                 int nCount = 0;
                 std::vector<uint16_t> y = {};
 
-                while (true)
-                {
+                while (true) {
                     nCount++;
                     RIPEMD_160 rHash;
                     std::string rStr = generateRandomMessage();
                     std::string rResult = rHash.ripemd_160(rStr);
-                    
+
                     uint16_t rFirstB = firstBits(rResult, masks[i]);
 
                     y.push_back(rFirstB);
-                    if (rFirstB == firstB)
-                    {
+                    if (rFirstB == firstB) {
                         countN[i][j][k] = nCount;
                         // std::cout << nCount << std::endl;
                         break;
