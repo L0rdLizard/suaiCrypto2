@@ -9,3 +9,4 @@
 .vscode
 tempCodeRunnerFile.*
 build/
+.idea/

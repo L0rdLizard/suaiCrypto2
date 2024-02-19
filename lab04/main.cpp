@@ -119,6 +119,7 @@ int main(int argc, char** argv) {
                 while (true) {
                     nCount++;
                     RIPEMD_160 rHash;
+                    
                     std::string rStr = generateRandomMessage();
                     std::string rResult = rHash.ripemd_160(rStr);
 

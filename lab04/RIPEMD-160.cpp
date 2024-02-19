@@ -1,4 +1,4 @@
-#include "RIPEMD-160.h"  //Подключаем описание класса
+#include "RIPEMD-160.h"
 
 unsigned int R1[] = {0,  1, 2,  3, 4,  5,  6, 7,  8, 9,  10, 11, 12, 13, 14, 15, 7,  4,  13, 1,
                      10, 6, 15, 3, 12, 0,  9, 5,  2, 14, 11, 8,  3,  10, 14, 4,  9,  15, 8,  1,
@@ -20,9 +20,7 @@ unsigned int S2[] = {8,  9,  9,  11, 13, 15, 15, 5, 7,  7,  8,  11, 14, 14, 12, 
                      12, 13, 5,  14, 13, 13, 7,  5, 15, 5,  8,  11, 14, 14, 6,  14, 6,  9,  12, 9,
                      12, 5,  15, 8,  8,  5,  12, 9, 12, 5,  14, 6,  8,  13, 6,  5,  15, 13, 11, 11};
 
-unsigned int RIPEMD_160::F(unsigned int j, unsigned int x, unsigned int y,
-                           unsigned int z)  // Выбор битовой функции в соответсвии с номером цикла
-{
+unsigned int RIPEMD_160::F(unsigned int j, unsigned int x, unsigned int y, unsigned int z) {
     if (j <= 15)
         return x ^ y ^ z;
     else if (j <= 31)
@@ -37,9 +35,7 @@ unsigned int RIPEMD_160::F(unsigned int j, unsigned int x, unsigned int y,
         return 0;
 }
 
-unsigned int RIPEMD_160::K1(
-    unsigned int j)  // Выбор константы в соответсвии с номером цикла для первого потока
-{
+unsigned int RIPEMD_160::K1(unsigned int j) {
     if (j <= 15)
         return 0x00000000;
     else if (j <= 31)
@@ -54,9 +50,7 @@ unsigned int RIPEMD_160::K1(
         return 0;
 }
 
-unsigned int RIPEMD_160::K2(
-    unsigned int j)  // Выбор константы в соответсвии с номером цикла для второго потока
-{
+unsigned int RIPEMD_160::K2(unsigned int j) {
     if (j <= 15)
         return 0x50A28BE6;
     else if (j <= 31)
@@ -71,113 +65,88 @@ unsigned int RIPEMD_160::K2(
         return 0;
 }
 
-unsigned int RIPEMD_160::inv(unsigned int value)  // Смена порядка бит (endians)
-{
-    unsigned int res = 0;  // Объявляем переменную результата
+unsigned int RIPEMD_160::inv(unsigned int value) {
+    unsigned int res = 0;
 
-    res |= ((value >> 0) & 0xFF) << 24;  // Менаяем
-    res |= ((value >> 8) & 0xFF) << 16;  // Порядок бит
-    res |= ((value >> 16) & 0xFF) << 8;  // В каждом из
-    res |= ((value >> 24) & 0xFF) << 0;  // 4х байтов
+    res |= ((value >> 0) & 0xFF) << 24;
+    res |= ((value >> 8) & 0xFF) << 16;
+    res |= ((value >> 16) & 0xFF) << 8;
+    res |= ((value >> 24) & 0xFF) << 0;
 
-    return res;  // Возвращаем результат
+    return res;
 }
 
-unsigned int RIPEMD_160::bytes_to_uint(char* bytes)  // Преоразование 4х байтов в unsigned int
-{
-    unsigned int res = 0;  // Объявляем переменную результата
+unsigned int RIPEMD_160::bytes_to_uint(char* bytes) {
+    unsigned int res = 0;
 
-    res |= ((unsigned int)bytes[3] << 24) & 0xFF000000;  // Преобразуем
-    res |= ((unsigned int)bytes[2] << 16) & 0xFF0000;    // Каждый
-    res |= ((unsigned int)bytes[1] << 8) & 0xFF00;       // Из
-    res |= ((unsigned int)bytes[0] << 0) & 0xFF;         // 4х байтов
+    res |= ((unsigned int)bytes[3] << 24) & 0xFF000000;
+    res |= ((unsigned int)bytes[2] << 16) & 0xFF0000;
+    res |= ((unsigned int)bytes[1] << 8) & 0xFF00;
+    res |= ((unsigned int)bytes[0] << 0) & 0xFF;
 
-    return res;  // Возвращаем результат
+    return res;
 }
 
-bool RIPEMD_160::read_file(char* fileName)  // Чтение из файла
-{
-    ifstream in(fileName, ios::binary);  // Открываем файл в бинарном режиме
+bool RIPEMD_160::read_file(char* fileName) {
+    ifstream in(fileName, ios::binary);
 
-    if (in.fail())     // Вернуть 0
-        return false;  // Если возникла ошибка
+    if (in.fail()) return false;
 
-    in.seekg(0, ios::end);                              // Подсчет
-    unsigned int file_size = (unsigned int)in.tellg();  // Размера
-    in.seekg(0, ios::beg);                              // Файла
+    in.seekg(0, ios::end);
+    unsigned int file_size = (unsigned int)in.tellg();
+    in.seekg(0, ios::beg);
 
-    message.resize(file_size);  // Меняем размер строки результата в соответствии с размером файла
-    in.read((char*)&message.front(), file_size);  // Считываем данные в массив
-    in.close();                                   // Закрываем файл
+    message.resize(file_size);
+    in.read((char*)&message.front(), file_size);
+    in.close();
 
-    return true;  // Возвращаем 1 в случае успеха
+    return true;
 }
 
-bool RIPEMD_160::write_file(char* fileName, string str)  // Запись в файл
-{
-    ofstream out(fileName);  // Открываем или создаем файл
+bool RIPEMD_160::write_file(char* fileName, string str) {
+    ofstream out(fileName);
 
-    if (out.fail())    // Вернуть 0
-        return false;  // Если возникла ошибка
+    if (out.fail()) return false;
 
-    out << str;  // Записываем строку с результатом в файл
+    out << str;
 
-    return true;  // Возвращаем 1 в случае успеха
+    return true;
 }
 
-void RIPEMD_160::extension()  // Шаг 1 - Расширение сообщения
-{
-    bitlen = message.size() * 8;  // Исходная длина сообщения в битах (нужна для шага 2)
+void RIPEMD_160::extension() {
+    bitlen = message.size() * 8;
 
-    message.push_back((unsigned char)0x80);  // Добавляем в конец сообщения единичный бит
+    message.push_back((unsigned char)0x80);
 
-    while ((message.size() * 8) % 512 !=
-           448)  // До тех пор, пока длина сообщения не станет равной 448 по модулю 512,
-        message.push_back(0);  // Заполняем сообщение нулями
+    while ((message.size() * 8) % 512 != 448) message.push_back(0);
 
-    blocks =
-        (unsigned int)(message.size() / 64) + 1;  // Количество блоков для обработки (+1 нужно для
-                                                  // блока из 8 байт, в который добавится bitlen)
+    blocks = (unsigned int)(message.size() / 64) + 1;
 }
 
-void RIPEMD_160::adding_length()  // Шаг 2 - Добавление длины сообщения
-{
-    X = new unsigned int*[blocks];  // Выделяем память под массив массивов блоков
+void RIPEMD_160::adding_length() {
+    X = new unsigned int*[blocks];
 
-    for (unsigned int i = 0; i < blocks; i++)  // Пока не кончились блоки
-    {
-        X[i] = new unsigned int[16];  // Выделяем память под текущий блок
+    for (unsigned int i = 0; i < blocks; i++) {
+        X[i] = new unsigned int[16];
 
-        for (int j = 0; j < (i == blocks - 1 ? 14 : 16);
-             j++)  // Если это не последний блок, то переносим преобразованное messgae в X,
-            X[i][j] =
-                bytes_to_uint(&message[(j * 4) + 64 * i]);  // Если блок послений, то делаем то же
-                                                            // самое, но оставляем 8 байт под bitlen
+        for (int j = 0; j < (i == blocks - 1 ? 14 : 16); j++)
+            X[i][j] = bytes_to_uint(&message[(j * 4) + 64 * i]);
 
-        if (i == blocks - 1)  // Если это последний блок
-        {
-            X[i][14] =
-                bitlen &
-                0xFFFFFFFF;  // То добавляем в него bitlen, причем в виде двух 4-байтовых слов,
-            X[i][15] = bitlen >> 32 &
-                       0xFFFFFFFF;  // Где первым добавляется слово, содержащее младшие разряды.
+        if (i == blocks - 1) {
+            X[i][14] = bitlen & 0xFFFFFFFF;
+            X[i][15] = bitlen >> 32 & 0xFFFFFFFF;
         }
     }
 }
 
-void RIPEMD_160::initialize_ripemd()  // Шаг 3 - Инициализация RIPEMD буфера
-{
-    H0 = 0x67452301, H1 = 0xEFCDAB89, H2 = 0x98BADCFE, H3 = 0x10325476,
-    H4 = 0xC3D2E1F0;  // Инициализиуем регистры
+void RIPEMD_160::initialize_ripemd() {
+    H0 = 0x67452301, H1 = 0xEFCDAB89, H2 = 0x98BADCFE, H3 = 0x10325476, H4 = 0xC3D2E1F0;
 }
 
-void RIPEMD_160::message_processing()  // Шаг 4 - Обработка сообщения в блоках
-{
-    for (unsigned int i = 0; i < blocks; i++)  // Цикл блоков сообщения
-    {
-        A1 = H0, B1 = H1, C1 = H2, D1 = H3,
-        E1 = H4;  // Сохраняем значения значения регистров на каждом этапе цикла
-        A2 = H0, B2 = H1, C2 = H2, D2 = H3, E2 = H4;  // Для двух потоков
+void RIPEMD_160::message_processing() {
+    for (unsigned int i = 0; i < blocks; i++) {
+        A1 = H0, B1 = H1, C1 = H2, D1 = H3, E1 = H4;
+        A2 = H0, B2 = H1, C2 = H2, D2 = H3, E2 = H4;
 
         for (unsigned int j = 0; j < 80; j++) {
             T = ROTATE_LEFT((A1 + F(j, B1, C1, D1) + X[i][R1[j]] + K1(j)), S1[j]) + E1;
@@ -189,38 +158,34 @@ void RIPEMD_160::message_processing()  // Шаг 4 - Обработка сооб
             A2 = E2, E2 = D2, D2 = ROTATE_LEFT(C2, 10), C2 = B2, B2 = T;
         }
 
-        T = H1 + C1 + D2;  // Обновляем значения регистров
-        H1 = H2 + D1 + E2, H2 = H3 + E1 + A2, H3 = H4 + A1 + B2,
-        H4 = H0 + B1 + C2;  // На каждом этапе цикла
-        H0 = T;             // Для двух потоков
+        T = H1 + C1 + D2;
+        H1 = H2 + D1 + E2, H2 = H3 + E1 + A2, H3 = H4 + A1 + B2, H4 = H0 + B1 + C2;
+        H0 = T;
     }
 
-    for (unsigned int i = 0; i < blocks; i++)  // Пока не кончились блоки
-        delete[] X[i];  // Освобождаем память, выделенную под текущий блок
+    for (unsigned int i = 0; i < blocks; i++) delete[] X[i];
 
-    delete[] X;  // Освобождаем память, выделенную под весь массив массивов блоков
+    delete[] X;
 }
 
-string RIPEMD_160::ripemd_160(string mess)  // Алгоритм преобразования
-{
-    unsigned int mess_size = mess.size();  // Сохраняем размер исходного сообщения
+string RIPEMD_160::ripemd_160(string mess) {
+    unsigned int mess_size = mess.size();
 
     message = mess;
 
     // cout << "Message: " << message << endl;
 
-    extension();  // Шаг 1 - Расширение сообщения
+    extension();
 
-    adding_length();  // Шаг 2 - Добавление длины сообщения
+    adding_length();
 
-    initialize_ripemd();  // Шаг 3 - Инициализация RIPEMD буфера
+    initialize_ripemd();
 
-    message_processing();  // Шаг 4 - Обработка сообщения в блоках
+    message_processing();
 
-    result << hex << inv(H0) << inv(H1) << inv(H2) << inv(H3)
-           << inv(H4);  // Шаг 5 - Результат в виде хэш-сообщения
+    result << hex << inv(H0) << inv(H1) << inv(H2) << inv(H3) << inv(H4);
 
     // cout << result.str() << endl;
 
-    return result.str();  // Возвращаем результат в виде хэш-сообщения
+    return result.str();
 }
