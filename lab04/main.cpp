@@ -107,11 +107,14 @@ int main(int argc, char** argv) {
     int countS[5][3][1000];
     // std::vector<uint16_t> y = {};
 
+    // 5 bit length
     for (int i = 0; i < 5; i++) {
+        // 3 key words
         for (int j = 0; j < 3; j++) {
             std::cout << "i = " << i << "; j = " << j << std::endl;
             uint16_t firstB = firstBits(massResult[j], masks[i]);
 
+            // 1000 exp
             for (int k = 0; k < 1000; k++) {
                 int nCount = 0;
                 std::vector<uint16_t> y = {};
