@@ -56,6 +56,7 @@ public:
     void generate_keys(int bitLength) {
         BN_CTX *ctx = BN_CTX_new();
 
+
         // Генерация двух простых чисел p и q
         BN_generate_prime_ex(p, bitLength / 2, 0, NULL, NULL, NULL);
         BN_generate_prime_ex(q, bitLength / 2, 0, NULL, NULL, NULL);
@@ -71,9 +72,17 @@ public:
         BN_mul(phi, p1, q1, ctx);
 
         // Выбор целого числа e такое, что 1 < e < phi и наибольший общий делитель (e, phi) = 1
+//        do {
+//            BN_rand(e, bitLength / 2, 0, 0);
+//        } while (BN_gcd(NULL, e, phi, ctx) != 1);
+        BIGNUM *gcd = BN_new();  // Создаем объект BIGNUM для хранения результата
+
         do {
             BN_rand(e, bitLength / 2, 0, 0);
-        } while (BN_gcd(NULL, e, phi, ctx) != 1);
+        } while (BN_gcd(gcd, e, phi, ctx) != 1);
+
+        BN_free(gcd);  // Освобождаем память после использования
+
 
         // Вычисление d, мультипликативного обратного к e по модулю phi
         BN_mod_inverse(d, e, phi, ctx);

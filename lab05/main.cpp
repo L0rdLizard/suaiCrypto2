@@ -4,10 +4,10 @@
 
 int main() {
     RSAfun rsa;
-    std::cout << "123";
+//    std::cout << "123";
     // Генерация ключей
     rsa.generate_keys(1024);
-    
+
     // Шифрование и расшифровка сообщения
     BIGNUM *message = BN_new();
     
