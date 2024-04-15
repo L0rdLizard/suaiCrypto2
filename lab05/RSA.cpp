@@ -8,7 +8,6 @@
 #include <iostream>
 #include <string>
 
-// Генерация ключей RSA
 RSA* generate_RSA_keys(int keylength) {
     RSA* rsa = RSA_new();
     BIGNUM* e = BN_new();
@@ -20,7 +19,15 @@ RSA* generate_RSA_keys(int keylength) {
     return rsa;
 }
 
-// Шифрование
+// Функция для вычисления мультипликативного обратного с помощью расширенного алгоритма Евклида
+BIGNUM* multiplicative_inverse(BIGNUM* a, BIGNUM* b) {
+        BN_CTX* ctx = BN_CTX_new();
+        BIGNUM* res = BN_new();
+        BN_mod_inverse(res, a, b, ctx);
+        BN_CTX_free(ctx);
+        return res;
+    }
+
 std::string RSA_encrypt(RSA* rsa, const std::string& message) {
     std::string ciphertext(RSA_size(rsa), 0);
     int ciphertext_len = RSA_public_encrypt(message.size(), (unsigned char*)message.data(),
@@ -28,7 +35,6 @@ std::string RSA_encrypt(RSA* rsa, const std::string& message) {
     return ciphertext.substr(0, ciphertext_len);
 }
 
-// Дешифрование
 std::string RSA_decrypt(RSA* rsa, const std::string& ciphertext) {
     std::string plaintext(RSA_size(rsa), 0);
     int plaintext_len = RSA_private_decrypt(ciphertext.size(), (unsigned char*)ciphertext.data(),
@@ -36,7 +42,6 @@ std::string RSA_decrypt(RSA* rsa, const std::string& ciphertext) {
     return plaintext.substr(0, plaintext_len);
 }
 
-// Создание подписи
 std::string create_signature(RSA* rsa, const std::string& message) {
     EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
     EVP_PKEY* pkey = EVP_PKEY_new();
@@ -55,7 +60,6 @@ std::string create_signature(RSA* rsa, const std::string& message) {
     return signature;
 }
 
-// Проверка подписи
 bool verify_signature(RSA* rsa, const std::string& message, const std::string& signature) {
     EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
     EVP_PKEY* pkey = EVP_PKEY_new();
