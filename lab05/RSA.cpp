@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 RSA* generate_RSA_keys(int keylength) {
     RSA* rsa = RSA_new();
@@ -53,12 +54,12 @@ std::string create_signature(RSA* rsa, const std::string& message) {
     size_t siglen;
     EVP_DigestSignFinal(mdctx, NULL, &siglen);
 
-    std::string signature(siglen, 0);
-    EVP_DigestSignFinal(mdctx, (unsigned char*)signature.data(), &siglen);
+    std::vector<unsigned char> signature(siglen);
+    EVP_DigestSignFinal(mdctx, signature.data(), &siglen);
 
     EVP_MD_CTX_free(mdctx);
 
-    return signature;
+    return std::string(signature.begin(), signature.end());
 }
 
 bool verify_signature(RSA* rsa, const std::string& message, const std::string& signature) {
@@ -72,6 +73,8 @@ bool verify_signature(RSA* rsa, const std::string& message, const std::string& s
     int result = EVP_DigestVerifyFinal(mdctx, (unsigned char*)signature.data(), signature.size());
 
     EVP_MD_CTX_free(mdctx);
+    EVP_PKEY_free(pkey);
+
     return result == 1;
 }
 

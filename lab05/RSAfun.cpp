@@ -90,7 +90,7 @@ class RSAfun {
         do {
             BN_rand(e, bitLength / 2, 0, 0);
             BN_gcd(gcd, e, phi, ctx);
-        } while (BN_is_one(gcd) != 1);  // Исправленная строка
+        } while (BN_is_one(gcd) != 1);
 
         BN_mod_inverse(d, e, phi, ctx);
 
@@ -118,6 +118,8 @@ class RSAfun {
         BN_CTX_free(ctx);
         return decrypted;
     }
+
+
 
     // Функция для создания подписи
     BIGNUM* sign(BIGNUM* message) {
@@ -159,13 +161,12 @@ class RSAfun {
 
 int main() {
     RSAfun rsa;
-
-    rsa.generate_keys(1024);
-
-    // Шифрование и расшифровка сообщения
+    
+    rsa.generate_keys(512);
 
     BIGNUM* message = BN_new();
-    BN_set_word(message, 123456); 
+    BN_set_word(message, 123456);
+    
 
     // std::string message_str = "1234567";
     // BIGNUM* message = BN_new();
