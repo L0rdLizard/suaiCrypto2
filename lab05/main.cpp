@@ -15,6 +15,8 @@ int main() {
 
     BIGNUM *encrypted = rsa.encrypt(message);
     BIGNUM *decrypted = rsa.decrypt(encrypted);
+    // char *decrypted_str = BN_bn2dec(decrypted);
+    // long long decrypted_message = std::stoll(decrypted_str);
 
     // Создание и проверка подписи
     BIGNUM *signature = rsa.sign(message);
@@ -24,6 +26,7 @@ int main() {
     std::cout << "Original message: " << BN_bn2dec(message) << std::endl;
     std::cout << "Encrypted message: " << BN_bn2dec(encrypted) << std::endl;
     std::cout << "Decrypted message: " << BN_bn2dec(decrypted) << std::endl;
+    // std::cout << "Decrypted message2: " << decrypted_message << std::endl;
     std::cout << "Signature is " << (isValid ? "valid" : "invalid") << std::endl;
 
     // Освобождение памяти

@@ -67,7 +67,7 @@ void writeArrayToFile(const int (&arr)[5][3][1000], std::string fileName1, std::
 }
 
 int main(int argc, char** argv) {
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    // std::srand(static_cast<unsigned int>(std::time(nullptr)));
     // if (argc != 2){
     //     cout << endl << "Usage: ./RIPEMD-160 file_in" << endl << endl;
     //     return -1;
@@ -82,66 +82,70 @@ int main(int argc, char** argv) {
     //         cout << "Write error!" << endl << endl;
 
     // }
-    // string message = "The quick brown fox jumps over the lazy dog";
-    // RIPEMD_160 hash;
+    string message = "The quick brown fox jumps over the lazy dog";
+    RIPEMD_160 hash;
     // hash.ripemd_160("The quick brown fox jumps over the lazy dog");
+    
+    cout << "message: " << message << endl;
+    cout << "result: " << hash.ripemd_160("The quick brown fox jumps over the lazy dog");
+    cout << """\nRight hash of 'The quick brown fox jumps over the lazy dog' is 37f332f68db77bd9d7edd4969571ad671cf9dd3b\n""";
 
     // unsigned int masks[] = {0xFF, 0x3FF, 0xFFF, 0x3FFF, 0xFFFF};
-    unsigned int masks[] = {0x0F, 0x3F, 0xFF, 0x3FF, 0xFFF};
+    // unsigned int masks[] = {0x0F, 0x3F, 0xFF, 0x3FF, 0xFFF};
 
-    string message1 = "Love";
-    string message2 = "borzoi";
-    string message3 = "\x00\x00\x00\x00\x00";
-    RIPEMD_160 hash1;
-    std::string result1 = hash1.ripemd_160(message1);
+    // string message1 = "Love";
+    // string message2 = "borzoi";
+    // string message3 = "\x00\x00\x00\x00\x00";
+    // RIPEMD_160 hash1;
+    // std::string result1 = hash1.ripemd_160(message1);
 
-    RIPEMD_160 hash2;
-    std::string result2 = hash2.ripemd_160(message2);
+    // RIPEMD_160 hash2;
+    // std::string result2 = hash2.ripemd_160(message2);
 
-    RIPEMD_160 hash3;
-    std::string result3 = hash3.ripemd_160(message3);
+    // RIPEMD_160 hash3;
+    // std::string result3 = hash3.ripemd_160(message3);
 
-    std::string massResult[] = {result1, result2, result3};
+    // std::string massResult[] = {result1, result2, result3};
 
-    int countN[5][3][1000];
-    int countS[5][3][1000];
-    // std::vector<uint16_t> y = {};
+    // int countN[5][3][1000];
+    // int countS[5][3][1000];
+    // // std::vector<uint16_t> y = {};
 
-    // 5 bit length
-    for (int i = 0; i < 5; i++) {
-        // 3 key words
-        for (int j = 0; j < 3; j++) {
-            std::cout << "i = " << i << "; j = " << j << std::endl;
-            uint16_t firstB = firstBits(massResult[j], masks[i]);
+    // // 5 bit length
+    // for (int i = 0; i < 5; i++) {
+    //     // 3 key words
+    //     for (int j = 0; j < 3; j++) {
+    //         std::cout << "i = " << i << "; j = " << j << std::endl;
+    //         uint16_t firstB = firstBits(massResult[j], masks[i]);
 
-            // 1000 exp
-            for (int k = 0; k < 1000; k++) {
-                int nCount = 0;
-                std::vector<uint16_t> y = {};
+    //         // 1000 exp
+    //         for (int k = 0; k < 1000; k++) {
+    //             int nCount = 0;
+    //             std::vector<uint16_t> y = {};
 
-                while (true) {
-                    nCount++;
-                    RIPEMD_160 rHash;
+    //             while (true) {
+    //                 nCount++;
+    //                 RIPEMD_160 rHash;
                     
-                    std::string rStr = generateRandomMessage();
-                    std::string rResult = rHash.ripemd_160(rStr);
+    //                 std::string rStr = generateRandomMessage();
+    //                 std::string rResult = rHash.ripemd_160(rStr);
 
-                    uint16_t rFirstB = firstBits(rResult, masks[i]);
+    //                 uint16_t rFirstB = firstBits(rResult, masks[i]);
 
-                    y.push_back(rFirstB);
-                    if (rFirstB == firstB) {
-                        countN[i][j][k] = nCount;
-                        // std::cout << nCount << std::endl;
-                        break;
-                    }
-                }
-                countS[i][j][k] = countSteps(y);
-            }
-        }
-    }
+    //                 y.push_back(rFirstB);
+    //                 if (rFirstB == firstB) {
+    //                     countN[i][j][k] = nCount;
+    //                     // std::cout << nCount << std::endl;
+    //                     break;
+    //                 }
+    //             }
+    //             countS[i][j][k] = countSteps(y);
+    //         }
+    //     }
+    // }
 
-    writeArrayToFile(countN, "countN1.txt", "countN2.txt", "countN3.txt");
-    writeArrayToFile(countS, "countS1.txt", "countS2.txt", "countS3.txt");
+    // writeArrayToFile(countN, "countN1.txt", "countN2.txt", "countN3.txt");
+    // writeArrayToFile(countS, "countS1.txt", "countS2.txt", "countS3.txt");
 
     // for (int i = 0; i < 1000; i++)
     // {

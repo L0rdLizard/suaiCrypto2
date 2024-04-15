@@ -78,6 +78,7 @@ int main() {
     std::string decrypted_message = RSA_decrypt(rsa, ciphertext);
 
     std::cout << "Original message: " << message << std::endl;
+    // std::cout << "Ciphertext: " << ciphertext << std::endl;
     std::cout << "Decrypted message: " << decrypted_message << std::endl;
 
     std::string signature = create_signature(rsa, message);
