@@ -8,10 +8,10 @@
 #include <random>
 
 class RSAfun {
-   private:
+    private:
     BIGNUM *p, *q, *n, *phi, *e, *d;
 
-   public:
+    public:
     RSAfun() {
         p = BN_new();
         q = BN_new();
@@ -56,7 +56,7 @@ class RSAfun {
     //     BN_sub_word(q1, 1);
     //     BN_mul(phi, p1, q1, ctx);
 
-    //     BIGNUM* gcd = BN_new(); 
+    //     BIGNUM* gcd = BN_new();
     //     do {
     //         BN_rand(e, bitLength / 2, 0, 0);
     //     } while (BN_gcd(gcd, e, phi, ctx) != 1);
@@ -90,7 +90,7 @@ class RSAfun {
         do {
             BN_rand(e, bitLength / 2, 0, 0);
             BN_gcd(gcd, e, phi, ctx);
-        } while (BN_is_one(gcd) != 1);
+        } while (BN_is_one(gcd) != 1);  // Исправленная строка
 
         BN_mod_inverse(d, e, phi, ctx);
 
@@ -163,16 +163,17 @@ int main() {
     rsa.generate_keys(1024);
 
     // Шифрование и расшифровка сообщения
-    BIGNUM* message = BN_new();
 
-    BN_set_word(message, 123456);  // Пример сообщения
+    BIGNUM* message = BN_new();
+    BN_set_word(message, 123456); 
+
+    // std::string message_str = "1234567";
+    // BIGNUM* message = BN_new();
+    // BN_hex2bn(&message, message_str.c_str());
 
     BIGNUM* encrypted = rsa.encrypt(message);
     BIGNUM* decrypted = rsa.decrypt(encrypted);
-    // char *decrypted_str = BN_bn2dec(decrypted);
-    // long long decrypted_message = std::stoll(decrypted_str);
 
-    // Создание и проверка подписи
     BIGNUM* signature = rsa.sign(message);
     bool isValid = rsa.verify(message, signature);
 
@@ -180,10 +181,8 @@ int main() {
     std::cout << "Original message: " << BN_bn2dec(message) << std::endl;
     std::cout << "Encrypted message: " << BN_bn2dec(encrypted) << std::endl;
     std::cout << "Decrypted message: " << BN_bn2dec(decrypted) << std::endl;
-    // std::cout << "Decrypted message2: " << decrypted_message << std::endl;
     std::cout << "Signature is " << (isValid ? "valid" : "invalid") << std::endl;
 
-    // Освобождение памяти
     BN_free(message);
     BN_free(encrypted);
     BN_free(decrypted);
