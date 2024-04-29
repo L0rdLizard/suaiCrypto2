@@ -48,7 +48,7 @@ std::string create_signature(RSA* rsa, const std::string& message) {
     EVP_PKEY* pkey = EVP_PKEY_new();
     EVP_PKEY_assign_RSA(pkey, rsa);
 
-    EVP_DigestSignInit(mdctx, NULL, EVP_md4(), NULL, pkey);
+    EVP_DigestSignInit(mdctx, NULL, EVP_sha256(), NULL, pkey);
     EVP_DigestSignUpdate(mdctx, message.data(), message.size());
 
     size_t siglen;
@@ -67,7 +67,7 @@ bool verify_signature(RSA* rsa, const std::string& message, const std::string& s
     EVP_PKEY* pkey = EVP_PKEY_new();
     EVP_PKEY_assign_RSA(pkey, rsa);
 
-    EVP_DigestVerifyInit(mdctx, NULL, EVP_md4(), NULL, pkey);
+    EVP_DigestVerifyInit(mdctx, NULL, EVP_sha256(), NULL, pkey);
     EVP_DigestVerifyUpdate(mdctx, message.data(), message.size());
 
     int result = EVP_DigestVerifyFinal(mdctx, (unsigned char*)signature.data(), signature.size());
