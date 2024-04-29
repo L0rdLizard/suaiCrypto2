@@ -12,3 +12,4 @@ build/
 .idea/
 lab05/cmake-build-debug/
 cmake-build-debug/
+cmake-build-debug-mingw/

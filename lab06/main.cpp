@@ -1,8 +1,8 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <cmath>
+#include <functional>
 #include <random>
 #include <vector>
-#include <functional> 
 
 using namespace boost::multiprecision;
 using namespace std;
@@ -11,26 +11,31 @@ cpp_int modInverse(cpp_int a, cpp_int m) {
     cpp_int m0 = m;
     cpp_int y = 0, x = 1;
 
-    if (m == 1)
+    if (m == 1) {
         return 0;
+    }
 
     while (a > 1) {
+        // q - частное
         cpp_int q = a / m;
         cpp_int t = m;
 
+        // m - это остаток
         m = a % m, a = t;
         t = y;
 
+        // обменять
         y = x - q * y;
         x = t;
     }
 
-    if (x < 0)
+    // Обеспечьте, чтобы x был положительным
+    if (x < 0) {
         x += m0;
+    }
 
     return x;
 }
-
 
 class Participant {
     public:
@@ -42,19 +47,43 @@ class Participant {
         s.resize(k);
         v.resize(k);
         b.resize(k);
-        cpp_int neg(1);
+        cpp_int neg1(-1);
+        cpp_int neg2(1);
         // cpp_int neg = negate<cpp_int>(1);
 
         // Генерация секретов
         for (int i = 0; i < k; i++) {
+            cout << "n: " << n << endl;
             s[i] = rand() % (n - 1) + 1;
+            cout << "s[i]: " << s[i] << endl;
+
             b[i] = rand() % 2;
-            // v[i] = powm(neg, b[i], n) * powm(powm(s[i], 2, n), neg, n);
-            if (b[i] == 0){
-                v[i] = 1;
-            } else{
-                v[i] = powm(neg, b[i], n) * powm(powm(s[i], 2, n), neg, n);
+            cout << "b[i]: " << b[i] << endl;
+
+            // v[i] = powm(neg1, b[i], n) * powm(powm(s[i], 2, n), neg2, n);
+
+            cpp_int result1 = powm(neg1, b[i], n);
+            cout << "result1: " << result1 << endl;
+
+            cpp_int result2 = powm(s[i], 2, n);
+            cout << "result2: " << result2 << endl;
+
+            if (result2 == 0) {
+                cerr << "Error: s[i]^2 % n is zero, cannot compute modInverse." << endl;
+                continue;
             }
+
+            cpp_int inv_result2 = modInverse(result2, n);
+            cout << "inv_result2: " << inv_result2 << endl;
+
+            v[i] = (result1 * inv_result2) % n;
+            cout << "v[i]: " << v[i] << endl;
+            cout << endl;
+            // if (b[i] == 0){
+            //     v[i] = 1;
+            // } else{
+            //     v[i] = powm(neg1, b[i], n) * powm(powm(s[i], 2, n), neg2, n);
+            // }
         }
     }
 
@@ -98,8 +127,8 @@ class Verifier {
 };
 
 int main() {
-    int k = 10;             // Количество раундов
-    cpp_int n = 21;  // Пример числа n
+    int k = 10;      // Количество раундов
+    cpp_int n = 77;  // Пример числа n
 
     Participant participant(k, n);
     Verifier verifier(participant);
