@@ -3,6 +3,7 @@
 #include <functional>
 #include <random>
 #include <vector>
+#include <ctime>
 
 using namespace boost::multiprecision;
 using namespace std;
@@ -38,6 +39,7 @@ cpp_int modInverse(cpp_int a, cpp_int m) {
 }
 
 class Participant {
+
     public:
     cpp_int n;
     cpp_int r;
@@ -50,19 +52,19 @@ class Participant {
         b.resize(k);
         cpp_int neg1(-1);
         cpp_int neg2(1);
-        cpp_int s_test[] = {187, 37411, 5204};
-        cpp_int b_test[] = {1, 1, 0};
+        // cpp_int s_test[] = {187, 37411, 5204};
+        // cpp_int b_test[] = {1, 1, 0};
         // cpp_int neg = negate<cpp_int>(1);
 
         // Генерация секретов
         for (int i = 0; i < k; i++) {
             cout << "n: " << n << endl;
-            // s[i] = rand() % (n - 1) + 1;
-            s[i] = s_test[i];
+            s[i] = rand() % (n - 1) + 1;
+            // s[i] = s_test[i];
             cout << "s[i]: " << s[i] << endl;
 
-            // b[i] = rand() % 2;
-            b[i] = b_test[i];
+            b[i] = rand() % 2;
+            // b[i] = b_test[i];
             cout << "b[i]: " << b[i] << endl;
 
             // v[i] = powm(neg1, b[i], n) * powm(powm(s[i], 2, n), neg2, n);
@@ -76,7 +78,7 @@ class Participant {
             cpp_int inv_result2 = modInverse(result2, n);
             cout << "inv_result2: " << inv_result2 << endl;
 
-            if (b[i] == 1){
+            if (b[i] == 1) {
                 inv_result2 = abs(n - inv_result2);
             }
 
@@ -89,9 +91,10 @@ class Participant {
     cpp_int generateX() {
         // cpp_int r = rand() % (n - 1) + 1;
         r = rand() % (n - 1) + 1;
-        // return powm(r, 2, n);
-        r = 1337;
-        return 428083;
+        // r = 1337;
+        return powm(r, 2, n);
+        
+        // return 428083;
     }
 
     cpp_int generateY(vector<cpp_int> e) {
@@ -104,6 +107,7 @@ class Participant {
 };
 
 class Verifier {
+
     public:
     cpp_int n;
     vector<cpp_int> v;
@@ -116,9 +120,9 @@ class Verifier {
         for (int i = 0; i < k; i++) {
             e[i] = rand() % 2;
         }
-        e[0] = 0;
-        e[1] = 1;
-        e[2] = 0;
+        // e[0] = 0;
+        // e[1] = 1;
+        // e[2] = 0;
         return e;
     }
 
@@ -132,31 +136,49 @@ class Verifier {
 };
 
 int main() {
-    int k = 3;      // Количество раундов
-    // cpp_int n = 21;
+    srand(time(nullptr));
+    int k = 3;
     cpp_int n = 553913;
 
     Participant participant(k, n);
     Verifier verifier(participant);
 
+    // for (int i = 0; i < k; i++) {
+    //     cpp_int x = participant.generateX();
+    //     cout << "x: " << x << endl;
+
+    //     vector<cpp_int> e = verifier.generateE();
+    //     cout << "e: ";
+    //     for (int i = 0; i < k; i++) {
+    //         cout << e[i] << " ";
+    //     }
+    //     cout << endl;
+
+    //     cpp_int y = participant.generateY(e);
+    //     cout << "y: " << y << endl;
+
+    //     if (!verifier.verify(x, y, e)) {
+    //         cout << "Auth not complete" << endl;
+    //         return 0;
+    //     }
+    // }
+
+    cpp_int x = participant.generateX();
+    cout << "x: " << x << endl;
+
+    vector<cpp_int> e = verifier.generateE();
+    cout << "e: ";
     for (int i = 0; i < k; i++) {
-        cpp_int x = participant.generateX();
-        cout << "x: " << x << endl;
+        cout << e[i] << " ";
+    }
+    cout << endl;
 
-        vector<cpp_int> e = verifier.generateE();
-        cout << "e: ";
-        for (int i = 0; i < k; i++){
-            cout << e[i] << " ";
-        }
-        cout << endl;
+    cpp_int y = participant.generateY(e);
+    cout << "y: " << y << endl;
 
-        cpp_int y = participant.generateY(e);
-        cout << "y: " << y << endl;
-
-        if (!verifier.verify(x, y, e)) {
-            cout << "Auth not complete" << endl;
-            return 0;
-        }
+    if (!verifier.verify(x, y, e)) {
+        cout << "Auth not complete" << endl;
+        return 0;
     }
 
     cout << "Auth complete" << endl;
