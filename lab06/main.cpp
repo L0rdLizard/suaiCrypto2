@@ -1,9 +1,9 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <cmath>
+#include <ctime>
 #include <functional>
 #include <random>
 #include <vector>
-#include <ctime>
 
 using namespace boost::multiprecision;
 using namespace std;
@@ -37,10 +37,10 @@ cpp_int modInverse(cpp_int a, cpp_int m) {
 
     return x;
 }
+cpp_int f[] = {0, 1, 0};
 
 class Participant {
-
-    public:
+   public:
     cpp_int n;
     cpp_int r;
     vector<cpp_int> s, v, b;
@@ -52,63 +52,65 @@ class Participant {
         b.resize(k);
         cpp_int neg1(-1);
         cpp_int neg2(1);
-        // cpp_int s_test[] = {187, 37411, 5204};
-        // cpp_int b_test[] = {1, 1, 0};
+        cpp_int s_test[] = {187, 37411, 5204};
+        cpp_int b_test[] = {1, 1, 0};
         // cpp_int neg = negate<cpp_int>(1);
 
         // Генерация секретов
         for (int i = 0; i < k; i++) {
-            cout << "n: " << n << endl;
-            s[i] = rand() % (n - 1) + 1;
-            // s[i] = s_test[i];
-            cout << "s[i]: " << s[i] << endl;
+            // cout << "n: " << n << endl;
+            s[i] = ( rand() % (n - 1) )  + 1;
+            s[i] = s_test[i];
+            // cout << "s[i]: " << s[i] << endl;
 
             b[i] = rand() % 2;
-            // b[i] = b_test[i];
-            cout << "b[i]: " << b[i] << endl;
+            b[i] = b_test[i];
+            // cout << "b[i]: " << b[i] << endl;
 
             // v[i] = powm(neg1, b[i], n) * powm(powm(s[i], 2, n), neg2, n);
 
             cpp_int result1 = powm(neg1, b[i], n);
-            cout << "result1: " << result1 << endl;
+            // cout << "result1: " << result1 << endl;
 
             cpp_int result2 = powm(s[i], 2, n);
-            cout << "result2: " << result2 << endl;
+            // cout << "result2: " << result2 << endl;
 
             cpp_int inv_result2 = modInverse(result2, n);
-            cout << "inv_result2: " << inv_result2 << endl;
+            // cout << "inv_result2: " << inv_result2 << endl;
 
             if (b[i] == 1) {
                 inv_result2 = abs(n - inv_result2);
             }
 
             v[i] = inv_result2;
-            cout << "v[i]: " << v[i] << endl;
-            cout << endl;
+            // cout << "v[i]: " << v[i] << endl;
+            // cout << endl;
         }
     }
 
     cpp_int generateX() {
-        // cpp_int r = rand() % (n - 1) + 1;
-        r = rand() % (n - 1) + 1;
+        r = ( rand() % (n - 1) ) + 1;
         // r = 1337;
-        return powm(r, 2, n);
-        
+
+        return n - powm(r, 2, n);
+
         // return 428083;
     }
+
 
     cpp_int generateY(vector<cpp_int> e) {
         cpp_int y = r;
         for (int i = 0; i < k; i++) {
             y = (y * powm(s[i], e[i], n)) % n;
         }
+
         return y;
+        // return 166337;
     }
 };
 
 class Verifier {
-
-    public:
+   public:
     cpp_int n;
     vector<cpp_int> v;
     int k;
@@ -119,6 +121,7 @@ class Verifier {
         vector<cpp_int> e(k);
         for (int i = 0; i < k; i++) {
             e[i] = rand() % 2;
+            e[i] = f[i];
         }
         // e[0] = 0;
         // e[1] = 1;
@@ -138,47 +141,32 @@ class Verifier {
 int main() {
     srand(time(nullptr));
     int k = 3;
-    cpp_int n = 553913;
+    int t = 1;
+    // cpp_int n = 553913;
+    cpp_int n = 3169 * 3557;
 
     Participant participant(k, n);
     Verifier verifier(participant);
 
-    // for (int i = 0; i < k; i++) {
-    //     cpp_int x = participant.generateX();
-    //     cout << "x: " << x << endl;
+    for (int i = 0; i < t; i++) {
+        cpp_int x = participant.generateX();
+        cout << "x: " << x << endl;
 
-    //     vector<cpp_int> e = verifier.generateE();
-    //     cout << "e: ";
-    //     for (int i = 0; i < k; i++) {
-    //         cout << e[i] << " ";
-    //     }
-    //     cout << endl;
+        vector<cpp_int> e = verifier.generateE();
+        // cout << "e: ";
+        // for (int i = 0; i < k; i++) {
+        //     cout << e[i] << " ";
+        // }
+        // cout << endl;
 
-    //     cpp_int y = participant.generateY(e);
-    //     cout << "y: " << y << endl;
+        cpp_int y = participant.generateY(e);
+        cout << "y: " << y << endl;
+        // x = x + 1;
 
-    //     if (!verifier.verify(x, y, e)) {
-    //         cout << "Auth not complete" << endl;
-    //         return 0;
-    //     }
-    // }
-
-    cpp_int x = participant.generateX();
-    cout << "x: " << x << endl;
-
-    vector<cpp_int> e = verifier.generateE();
-    cout << "e: ";
-    for (int i = 0; i < k; i++) {
-        cout << e[i] << " ";
-    }
-    cout << endl;
-
-    cpp_int y = participant.generateY(e);
-    cout << "y: " << y << endl;
-
-    if (!verifier.verify(x, y, e)) {
-        cout << "Auth not complete" << endl;
-        return 0;
+        if (!verifier.verify(x, y, e)) {
+            cout << "Auth not complete" << endl;
+            return 0;
+        }
     }
 
     cout << "Auth complete" << endl;
