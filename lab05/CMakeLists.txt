@@ -7,7 +7,7 @@ include(FetchContent)
 
 find_package(OpenSSL REQUIRED)
 
-add_executable(lab05 RSAfun.cpp)
+add_executable(lab05 lab05.cpp)
 
 
 #FetchContent_Declare(
