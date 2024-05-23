@@ -142,8 +142,11 @@ int main() {
     srand(time(nullptr));
     int k = 3;
     int t = 1;
+    cout << "k: " << k << endl;
+    cout << "t: " << t << endl;
     // cpp_int n = 553913;
     cpp_int n = 3169 * 3557;
+    cout << "n: " << n << endl;
 
     Participant participant(k, n);
     Verifier verifier(participant);
@@ -153,11 +156,11 @@ int main() {
         cout << "x: " << x << endl;
 
         vector<cpp_int> e = verifier.generateE();
-        // cout << "e: ";
-        // for (int i = 0; i < k; i++) {
-        //     cout << e[i] << " ";
-        // }
-        // cout << endl;
+        cout << "e: ";
+        for (int i = 0; i < k; i++) {
+            cout << e[i] << " ";
+        }
+        cout << endl;
 
         cpp_int y = participant.generateY(e);
         cout << "y: " << y << endl;

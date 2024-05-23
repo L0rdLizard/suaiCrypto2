@@ -24,18 +24,21 @@ averages2 = find_average(filename2)
 
 plt.plot(bits, averages1, marker='o', linestyle='-')
 
+print(averages1)
+print(averages2)
+
 # Добавление заголовка и меток осей
-plt.title('График 1')
-plt.xlabel('len')
-plt.ylabel('N')
+plt.title('Второй прообраз')
+plt.xlabel('bits')
+plt.ylabel('value')
 
 plt.grid(True)
 plt.show()
 
 plt.plot(bits, averages2, marker='o', linestyle='-')
-plt.title('График 2')
-plt.xlabel('len')
-plt.ylabel('N')
+plt.title('Коллизия')
+plt.xlabel('bits')
+plt.ylabel('value')
 
 plt.grid(True)
 plt.show()
