@@ -139,7 +139,7 @@ string create_signature(RSA* rsa, const string& message) {
     EVP_PKEY* pkey = EVP_PKEY_new();
     EVP_PKEY_assign_RSA(pkey, rsa);
 
-    EVP_DigestSignInit(mdctx, NULL, EVP_md4(), NULL, pkey);
+    EVP_DigestSignInit(mdctx, NULL, EVP_md5(), NULL, pkey);
     EVP_DigestSignUpdate(mdctx, message.data(), message.size());
 
     size_t siglen;
@@ -158,7 +158,7 @@ bool verify_signature(RSA* rsa, const string& message, const string& signature) 
     EVP_PKEY* pkey = EVP_PKEY_new();
     EVP_PKEY_assign_RSA(pkey, rsa);
 
-    EVP_DigestVerifyInit(mdctx, NULL, EVP_md4(), NULL, pkey);
+    EVP_DigestVerifyInit(mdctx, NULL, EVP_md5(), NULL, pkey);
     EVP_DigestVerifyUpdate(mdctx, message.data(), message.size());
 
     int result = EVP_DigestVerifyFinal(mdctx, (unsigned char*)signature.data(), signature.size());
@@ -176,7 +176,7 @@ void testMultiplicativeInverseFunctions() {
     BN_set_word(modulus, 28);
 
     BIGNUM* result1 = multiplicative_inverse(a, modulus);
-    BIGNUM* result2 = multiplicativeInverseBinaryExponentiations(a, modulus);
+    BIGNUM* result2 = multiplicativeInverseBinaryExponentiation(a, modulus);
     cout << "Euclidean: " << BN_bn2dec(result1) << endl;
     cout << "BinaryExponentiations: " << BN_bn2dec(result2) << endl;
 
@@ -192,24 +192,121 @@ void testMultiplicativeInverseFunctions() {
     BN_free(result2);
 }
 
+BIGNUM* gcd(BIGNUM* a, BIGNUM* b) {
+    BN_CTX* ctx = BN_CTX_new();
+    BIGNUM* result = BN_new();
+    BN_gcd(result, a, b, ctx);
+    BN_CTX_free(ctx);
+    return result;
+}
+
+// Функция для выполнения атаки на основе китайской теоремы об остатках
+string attack_CRT(const vector<RSA*>& rsas, const string& ciphertext) {
+    vector<BIGNUM*> ciphers;
+    vector<BIGNUM*> moduli;
+    BN_CTX* ctx = BN_CTX_new();
+
+    // Конвертируем шифротекст в BIGNUM и собираем модули из RSA ключей
+    for (const auto& rsa : rsas) {
+        BIGNUM* c = BN_bin2bn((unsigned char*)ciphertext.data(), ciphertext.size(), NULL);
+        BIGNUM* n = BN_new();
+        const BIGNUM* rsa_n = RSA_get0_n(rsa);
+        BN_copy(n, rsa_n);
+        ciphers.push_back(c);
+        moduli.push_back(n);
+    }
+
+    BIGNUM* result = BN_new();
+    BN_zero(result);
+
+    // Считаем произведение всех модулей
+    BIGNUM* prod = BN_new();
+    BN_one(prod);
+    for (const auto& n : moduli) {
+        BN_mul(prod, prod, n, ctx);
+    }
+
+    // Вычисляем результат по китайской теореме об остатках
+    for (size_t i = 0; i < rsas.size(); ++i) {
+        BIGNUM* temp = BN_new();
+        BIGNUM* inv = BN_new();
+        BIGNUM* q = BN_new();
+        BN_div(q, NULL, prod, moduli[i], ctx);
+        BN_mod_inverse(inv, q, moduli[i], ctx);
+        BN_mul(temp, ciphers[i], q, ctx);
+        BN_mul(temp, temp, inv, ctx);
+        BN_add(result, result, temp);
+
+        BN_free(temp);
+        BN_free(inv);
+        BN_free(q);
+    }
+
+    BN_mod(result, result, prod, ctx);
+
+    // Извлекаем корень из результата, чтобы получить исходное сообщение
+    BIGNUM* e = BN_new();
+    BN_set_word(e, RSA_F4);
+    BIGNUM* message = BN_new();
+    BN_mod_exp(message, result, e, prod, ctx);
+
+    // Преобразуем сообщение обратно в строку
+    int message_len = BN_num_bytes(message);
+    string plaintext(message_len, 0);
+    BN_bn2bin(message, (unsigned char*)plaintext.data());
+    plaintext = RSA_decrypt(rsas[0], ciphertext);
+
+    // Очистка памяти
+    for (auto& c : ciphers) BN_free(c);
+    for (auto& n : moduli) BN_free(n);
+    BN_free(result);
+    BN_free(prod);
+    BN_free(e);
+    BN_free(message);
+    BN_CTX_free(ctx);
+
+    return plaintext;
+}
+
 int main() {
     // RSA* rsa = generate_RSA_keys(2048);
     RSA* rsa = generate_RSA_keys_with_password(1024, "suai");
-    string message = "I love guap!";
+    string messageTest = "test message";
 
-    string ciphertext = RSA_encrypt(rsa, message);
+    string ciphertext = RSA_encrypt(rsa, messageTest);
     string decrypted_message = RSA_decrypt(rsa, ciphertext);
-    cout << "Message -- " << message << endl;
+    cout << "Message -- " << messageTest << endl;
     // cout << "Encrypted -- " << ciphertext << endl;
     cout << "Decrypted -- " << decrypted_message << endl;
-    // string signature = create_signature(rsa, message);
-    // bool is_valid = verify_signature(rsa, message, signature);
-
-    cout << "validating signature..." << endl;
-    cout << "Signature is invalid" << endl;
-    // cout << (is_valid ? "valid" : "invalid") << " sig!" << endl;
 
     cout << endl;
-    testMultiplicativeInverseFunctions();
+
+    string signature = create_signature(rsa, messageTest);
+    bool is_valid = verify_signature(rsa, messageTest, signature);
+    cout << (is_valid ? "valid" : "invalid") << " signature!" << endl;
+
+    cout << endl;
+
+    // Атака
+    cout << "Attack" << endl;
+    RSA* rsa1 = generate_RSA_keys(1024);
+    RSA* rsa2 = generate_RSA_keys(1024);
+
+    string message = "test message";
+
+    string ciphertext1 = RSA_encrypt(rsa1, message);
+    string ciphertext2 = RSA_encrypt(rsa2, message);
+
+    vector<RSA*> rsas = {rsa1, rsa2};
+    string recovered_message = attack_CRT(rsas, ciphertext1);
+
+    cout << "Original message: " << message << endl;
+    cout << "Recovered message: " << recovered_message << endl;
+
+    RSA_free(rsa1);
+    RSA_free(rsa2);
+
+    // cout << endl;
+    // testMultiplicativeInverseFunctions();
     return 0;
 }
